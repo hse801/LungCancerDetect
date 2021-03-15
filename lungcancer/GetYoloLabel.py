@@ -120,7 +120,8 @@ def GetYoloLabel(fPath):
 
 # foldList = glob.glob('E:/HSE/PyTorch-YOLOv3/data/temp/images/test/*/')
 # foldList = glob.glob('E:/HSE/PyTorch-YOLOv3/wholedata/images/train/*/')
-foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/train/*/')
+# foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/train/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/testset/*/')
 count = 0
 
 for i in foldList:

@@ -27,13 +27,29 @@ def nifti_convert(fPath):
     img_ct_data[img_ct_data > 500] = 500
     # standardization
     img_ct_data = (img_ct_data - nums[0]) / (nums[1] + 1e-8)
+    img_ct_data[img_ct_data > 3] = 3
     ct_rgb_data = ((img_ct_data - img_ct_data.min()) / (img_ct_data.max() - img_ct_data.min()) * 255).astype(np.uint8)
     ct_rgb_data = ct_rgb_data[:, ::-1, :]
     img_pet = sitk.ReadImage(pet_file)
     img_pet_data = sitk.GetArrayFromImage(img_pet)
     img_pet_data = (img_pet_data - nums[2]) / (nums[3] + 1e-8)
+    # img_pet_data[img_pet_data > 3] = 3
     pet_rgb_data = ((img_pet_data - img_pet_data.min()) / (img_pet_data.max() - img_pet_data.min()) * 255).astype(np.uint8)
     pet_rgb_data = pet_rgb_data[:, ::-1, :]
+    # plt.hist(pet_rgb_data[45,:,:])
+    # plt.title('PET data after norm')
+    # plt.plot(ct_rgb_data[0, 0, :])
+    # plt.hist(pet_rgb_data[:, :, 0])
+    # plt.show()
+    # plt.hist(pet_rgb_data[:, :, 40])
+    # plt.hist(pet_rgb_data[:, :, 0])
+    print('ct max = ', img_ct_data.max(), ' , pet max = ', img_pet_data.max())
+    print('ct min = ', img_ct_data.min(), ' , pet min = ', img_pet_data.min())
+    print('ct mean = ', img_ct_data.mean(), ' , pet mean = ', img_pet_data.mean())
+    print('ct rgb max = ', ct_rgb_data.max(), ' , pet rgb max = ', pet_rgb_data.max())
+    print('ct rgb min = ', ct_rgb_data.min(), ' , pet rgb max = ', pet_rgb_data.min())
+    print('ct rgb mean = ', ct_rgb_data.mean(), ' , pet rgb mean = ', pet_rgb_data.mean())
+    print('ct rgb shape = ', ct_rgb_data.shape, ' , pet rgb shae = ', pet_rgb_data.shape)
     img_roi = sitk.ReadImage(roi_file)
     img_roi_data = sitk.GetArrayFromImage(img_roi)
 
@@ -46,7 +62,7 @@ def nifti_convert(fPath):
     start_idx = new_nzero[0]
     end_idx = new_nzero[-1]
 
-    # j = start_idx
+    j = start_idx
     for j in range(start_idx, end_idx + 1):
         num = '{0:0>3}'.format(j)
         os.chdir(fPath)
@@ -63,7 +79,9 @@ def nifti_convert(fPath):
         # print('data match = ', np.all(load_pet == original_pet_slice))
 
 
-foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/train/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/testset/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+# foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/valid/45706084/')
 count = 0
 
 for i in foldList:

@@ -20,7 +20,7 @@ def CopyLymph(roi_path, patient_list):
         shutil.copytree(lymph_roi_path, 'RoiVolume')
 
 
-dstPath = glob.glob('E:/HSE/LungData_Cdrive/*/')
+dstPath = glob.glob('E:/HSE/LungDataPlus_Cdrive/*/')
 roiPath = glob.glob('C:/Users/Bohye/data/*/RoiVolume/')
 patient_list = []
 
