@@ -21,8 +21,6 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 import test  # import test.py to get mAP after each epoch
-# from experimental import attempt_load
-
 from models.experimental import attempt_load
 from models.yolo import Model
 from utils.autoanchor import check_anchors
@@ -70,23 +68,22 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
     names = ['item'] if opt.single_cls and len(data_dict['names']) != 1 else data_dict['names']  # class names
     assert len(names) == nc, '%g names found for nc=%g dataset in %s' % (len(names), nc, opt.data)  # check
 
-    # # Model
-    # pretrained = weights.endswith('.pt')
-    # if pretrained:
-    #     with torch_distributed_zero_first(rank):
-    #         attempt_download(weights)  # download if not found locally
-    #     ckpt = torch.load(weights, map_location=device)  # load checkpoint
-    #     if hyp.get('anchors'):
-    #         ckpt['model'].yaml['anchors'] = round(hyp['anchors'])  # force autoanchor
-    #     model = Model(opt.cfg or ckpt['model'].yaml, ch=3, nc=nc).to(device)  # create
-    #     exclude = ['anchor'] if opt.cfg or hyp.get('anchors') else []  # exclude keys
-    #     state_dict = ckpt['model'].float().state_dict()  # to FP32
-    #     state_dict = intersect_dicts(state_dict, model.state_dict(), exclude=exclude)  # intersect
-    #     model.load_state_dict(state_dict, strict=False)  # load
-    #     logger.info('Transferred %g/%g items from %s' % (len(state_dict), len(model.state_dict()), weights))  # report
-    # else:
-    #     model = Model(opt.cfg, ch=3, nc=nc).to(device)  # create
-    model = Model(opt.cfg, ch=3, nc=nc).to(device)  # create
+    # Model
+    pretrained = weights.endswith('.pt')
+    if pretrained:
+        with torch_distributed_zero_first(rank):
+            attempt_download(weights)  # download if not found locally
+        ckpt = torch.load(weights, map_location=device)  # load checkpoint
+        if hyp.get('anchors'):
+            ckpt['model'].yaml['anchors'] = round(hyp['anchors'])  # force autoanchor
+        model = Model(opt.cfg or ckpt['model'].yaml, ch=3, nc=nc).to(device)  # create
+        exclude = ['anchor'] if opt.cfg or hyp.get('anchors') else []  # exclude keys
+        state_dict = ckpt['model'].float().state_dict()  # to FP32
+        state_dict = intersect_dicts(state_dict, model.state_dict(), exclude=exclude)  # intersect
+        model.load_state_dict(state_dict, strict=False)  # load
+        logger.info('Transferred %g/%g items from %s' % (len(state_dict), len(model.state_dict()), weights))  # report
+    else:
+        model = Model(opt.cfg, ch=3, nc=nc).to(device)  # create
 
     # Freeze
     freeze = []  # parameter names to freeze (full or partial)
@@ -136,29 +133,29 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                                id=ckpt.get('wandb_id') if 'ckpt' in locals() else None)
     loggers = {'wandb': wandb}  # loggers dict
 
-    # # Resume
+    # Resume
     start_epoch, best_fitness = 0, 0.0
-    # if pretrained:
-    #     # Optimizer
-    #     if ckpt['optimizer'] is not None:
-    #         optimizer.load_state_dict(ckpt['optimizer'])
-    #         best_fitness = ckpt['best_fitness']
-    #
-    #     # Results
-    #     if ckpt.get('training_results') is not None:
-    #         with open(results_file, 'w') as file:
-    #             file.write(ckpt['training_results'])  # write results.txt
-    #
-    #     # Epochs
-    #     start_epoch = ckpt['epoch'] + 1
-    #     if opt.resume:
-    #         assert start_epoch > 0, '%s training to %g epochs is finished, nothing to resume.' % (weights, epochs)
-    #     if epochs < start_epoch:
-    #         logger.info('%s has been trained for %g epochs. Fine-tuning for %g additional epochs.' %
-    #                     (weights, ckpt['epoch'], epochs))
-    #         epochs += ckpt['epoch']  # finetune additional epochs
-    #
-    #     del ckpt, state_dict
+    if pretrained:
+        # Optimizer
+        if ckpt['optimizer'] is not None:
+            optimizer.load_state_dict(ckpt['optimizer'])
+            best_fitness = ckpt['best_fitness']
+
+        # Results
+        if ckpt.get('training_results') is not None:
+            with open(results_file, 'w') as file:
+                file.write(ckpt['training_results'])  # write results.txt
+
+        # Epochs
+        start_epoch = ckpt['epoch'] + 1
+        if opt.resume:
+            assert start_epoch > 0, '%s training to %g epochs is finished, nothing to resume.' % (weights, epochs)
+        if epochs < start_epoch:
+            logger.info('%s has been trained for %g epochs. Fine-tuning for %g additional epochs.' %
+                        (weights, ckpt['epoch'], epochs))
+            epochs += ckpt['epoch']  # finetune additional epochs
+
+        del ckpt, state_dict
 
     # Image sizes
     gs = int(model.stride.max())  # grid size (max stride)
@@ -315,7 +312,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                 pbar.set_description(s)
 
                 # Plot
-                if plots and ni < 10:
+                if plots and ni < 20:
                     f = save_dir / f'train_batch{ni}.jpg'  # filename
                     Thread(target=plot_images, args=(imgs, targets, paths, f), daemon=True).start()
                     # if tb_writer:
@@ -433,8 +430,9 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
 
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', type=str, help='initial weights path')
+    parser.add_argument('--weights', type=str, default='yolov3.pt',help='initial weights path')
     parser.add_argument('--cfg', type=str, default='', help='model.yaml path')
     parser.add_argument('--data', type=str, default='data/lungcancerdata.yaml', help='data.yaml path')
     parser.add_argument('--hyp', type=str, default='data/hyp.scratch.yaml', help='hyperparameters path')

@@ -28,13 +28,13 @@ def nifti_convert(fPath):
     # standardization
     img_ct_data = (img_ct_data - nums[0]) / (nums[1] + 1e-8)
     img_ct_data[img_ct_data > 3] = 3
-    ct_rgb_data = ((img_ct_data - img_ct_data.min()) / (img_ct_data.max() - img_ct_data.min()) * 255).astype(np.uint8)
+    ct_rgb_data = ((img_ct_data - img_ct_data.min()) / (img_ct_data.max() - img_ct_data.min()) * 255)
     ct_rgb_data = ct_rgb_data[:, ::-1, :]
     img_pet = sitk.ReadImage(pet_file)
     img_pet_data = sitk.GetArrayFromImage(img_pet)
     img_pet_data = (img_pet_data - nums[2]) / (nums[3] + 1e-8)
     # img_pet_data[img_pet_data > 3] = 3
-    pet_rgb_data = ((img_pet_data - img_pet_data.min()) / (img_pet_data.max() - img_pet_data.min()) * 255).astype(np.uint8)
+    pet_rgb_data = ((img_pet_data - img_pet_data.min()) / (img_pet_data.max() - img_pet_data.min()) * 255)
     pet_rgb_data = pet_rgb_data[:, ::-1, :]
     # plt.hist(pet_rgb_data[45,:,:])
     # plt.title('PET data after norm')
@@ -68,7 +68,12 @@ def nifti_convert(fPath):
         os.chdir(fPath)
         ct_slice = ct_rgb_data[j, :, :]
         pet_slice = pet_rgb_data[j, :, :]
-        data = np.stack((ct_slice, ct_slice, pet_slice), axis=-1)
+        # data = np.stack((ct_slice, ct_slice, pet_slice), axis=-1)
+        ratio_overlay1 = 0.8
+        ratio_overlay2 = 0.6
+        data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255) , ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+
+        data = data.astype(np.uint8)
         img = Image.fromarray(data, 'RGB')
         filename = 'CT_PET_slice' + num + '.jpg'
         img.save(filename)
@@ -79,8 +84,8 @@ def nifti_convert(fPath):
         # print('data match = ', np.all(load_pet == original_pet_slice))
 
 
-foldList = glob.glob('E:/HSE/LungCancerDetect/testset/*/')
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/valid/45706084/')
 count = 0
 
