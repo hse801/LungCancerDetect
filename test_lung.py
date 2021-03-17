@@ -207,11 +207,11 @@ def test(data,
 
         # Plot images
         # change the image saved in test/exp* folder
-        if plots and batch_i < 20:
-            f = save_dir / f'test_batch{batch_i}_labels.jpg'  # labels
-            Thread(target=plot_images, args=(img, targets, paths, f, names), daemon=True).start()
-            f = save_dir / f'test_batch{batch_i}_pred.jpg'  # predictions
-            Thread(target=plot_images, args=(img, output_to_target(output), paths, f, names), daemon=True).start()
+        # if plots and batch_i < 20:
+        f = save_dir / f'test_batch{batch_i}_labels.jpg'  # labels
+        Thread(target=plot_images, args=(img, targets, paths, f, names), daemon=True).start()
+        f = save_dir / f'test_batch{batch_i}_pred.jpg'  # predictions
+        Thread(target=plot_images, args=(img, output_to_target(output), paths, f, names), daemon=True).start()
 
     # Compute statistics
     stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
