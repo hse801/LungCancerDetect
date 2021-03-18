@@ -31,9 +31,15 @@ def nifti_convert(fPath):
     img_ct_data[img_ct_data > 500] = 500
     # standardization
     img_ct_data = (img_ct_data - nums[0]) / (nums[1] + 1e-8)
+    img_ct_data[img_ct_data > 3] = 3
+    ct_norm_data = ((img_ct_data - img_ct_data.min()) / (img_ct_data.max() - img_ct_data.min()) * 255)
+    ct_norm_data = ct_norm_data[:, ::-1, :]
     img_pet = sitk.ReadImage(pet_file)
     img_pet_data = sitk.GetArrayFromImage(img_pet)
     img_pet_data = (img_pet_data - nums[2]) / (nums[3] + 1e-8)
+    # img_pet_data[img_pet_data > 3] = 3
+    pet_norm_data = ((img_pet_data - img_pet_data.min()) / (img_pet_data.max() - img_pet_data.min()) * 255)
+    pet_norm_data = pet_norm_data[:, ::-1, :]
     img_roi = sitk.ReadImage(roi_file)
     img_roi_data = sitk.GetArrayFromImage(img_roi)
 
@@ -49,17 +55,38 @@ def nifti_convert(fPath):
     # j = start_idx
     for j in range(start_idx, end_idx + 1):
         num = '{0:0>3}'.format(j)
-        ct_slice = np.transpose(img_ct_data[j, :, :])
-        np.save(fPath + 'CT-cut-slice' + num, ct_slice)
-        print('ct slice array shape = ', ct_slice.shape)
-        print('CT data saved in ', fPath , 'for slice', j)
-        pet_slice = np.transpose(img_pet_data[j, :, :])
-        np.save(fPath + 'PET-cut-slice' + num, pet_slice)
-        print('PET data saved in ', fPath, 'for slice', j)
+        os.chdir(fPath)
+        # ct_slice = np.transpose(ct_norm_data[j, :, :])
+        # np.save(fPath + 'CT-cut-slice' + num, ct_slice)
+        # print('ct slice array shape = ', ct_slice.shape)
+        # print('CT data saved in ', fPath , 'for slice', j)
+        # pet_slice = np.transpose(pet_norm_data[j, :, :])
+        # np.save(fPath + 'PET-cut-slice' + num, pet_slice)
+        # print('PET data saved in ', fPath, 'for slice', j)
 
-        load_pet = np.load(fPath + 'PET-cut-slice' + num +'.npy')
-        original_pet_slice = img_pet_data[j, :, :]
-        print('data match = ', np.all(load_pet == original_pet_slice))
+        # save array which contain both CT, PET
+        ct_slice = ct_norm_data[j, :, :]
+        pet_slice = pet_norm_data[j, :, :]
+        zero_arr = np.zeros((128, 160))
+        print('ct slice array shape = ', ct_slice.shape)
+        ct_pet_data = np.stack((ct_slice, pet_slice), axis=-1)
+        ct_pet_data = ct_pet_data.astype(np.uint8)
+        np.save(fPath + 'CT_PET_slice' + num, ct_pet_data)
+        print('CT_PET data saved in ', fPath, 'for slice', j)
+
+
+        # img = Image.fromarray(ct_pet_data, 'RGB')
+        # filename = 'CT_PET_slice' + num + '.jpg'
+        # img.save(filename)
+        # print(filename, ' saved')
+
+        # plt.imshow(ct_pet_data)
+        # pil_pet = Image.fromarray(ct_pet_data, 'RGB')
+        # pil_pet.show()
+
+        # load_pet = np.load(fPath + 'PET-cut-slice' + num +'.npy')
+        # original_pet_slice = img_pet_data[j, :, :]
+        # print('data match = ', np.all(load_pet == original_pet_slice))
 
 
 # foldList = glob.glob('E:/HSE/PyTorch-YOLOv3/data/petctsample/*/')
@@ -67,7 +94,11 @@ def nifti_convert(fPath):
 # nifti_convert('E:/HSE/PyTorch-YOLOv3/data/temp/images/test/46332866/')
 # foldList = glob.glob('E:/HSE/PyTorch-YOLOv3/data/temp/images/test/*/')
 # foldList = glob.glob('E:/HSE/PyTorch-YOLOv3/wholepetct/images/train/*/')
-foldList = glob.glob('E:/HSE/PyTorch-YOLOv3/wholepetct/onlyoneimage/train/10918160/')
+# foldList = glob.glob('E:/HSE/PyTorch-YOLOv3/wholepetct/onlyoneimage/train/10918160/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
 count = 0
 
 for i in foldList:

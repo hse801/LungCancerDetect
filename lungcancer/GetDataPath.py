@@ -9,8 +9,8 @@ import pickle
 # file_list = glob.glob('E:/HSE/PyTorch-YOLOv3/wholepetct/images/valid/*/PET*slice*.npy')
 # file_list = glob.glob('E:/HSE/2dtempdata/*/*slice*.txt')
 # file_list = glob.glob('E:/HSE/PyTorch-YOLOv3_default/data/dumbbell/images/*.jpg')
-file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/CT_PET_*.jpg')
-# file_list = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/CT_PET_*.jpg')
+# file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/CT_PET_*.npy')
+file_list = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/CT_PET_*.npy')
 
 print('type = ', type(file_list))
 print('len = ', len(file_list))
@@ -18,7 +18,7 @@ print('len = ', len(file_list))
 
 # os.chdir('E:/HSE/LungCancer/yolov3/data/images/')
 os.chdir('E:/HSE/LungCancerDetect/data/images/')
-f = open('ct_pet_valid_whole.txt', 'w')
+f = open('ct_pet_test_arr.txt', 'w')
 for ele in file_list:
     f.write(ele + '\n')
 f.close()
