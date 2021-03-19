@@ -70,10 +70,10 @@ def nifti_convert(fPath):
         pet_slice = pet_rgb_data[j, :, :]
         zero_arr = np.zeros((128, 160))
         # data = np.stack((ct_slice, ct_slice, pet_slice), axis=-1)
-        data = np.stack((ct_slice, pet_slice, zero_arr), axis=-1)
+        # data = np.stack((ct_slice, pet_slice, zero_arr), axis=-1)
         ratio_overlay1 = 0.8
         ratio_overlay2 = 0.6
-        # data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255) , ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+        data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255) , ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
 
         data = data.astype(np.uint8)
         img = Image.fromarray(data, 'RGB')
@@ -87,8 +87,8 @@ def nifti_convert(fPath):
 
 
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
-foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
 # foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/valid/45706084/')
 count = 0
