@@ -1,5 +1,4 @@
-# Data 폴더의 lymph node roi 파일 복사하기
-# shutil 모듈 이용
+
 # 생성된 RoiVolume 폴더 안에서 roi 파일들 꺼내오기
 
 import os

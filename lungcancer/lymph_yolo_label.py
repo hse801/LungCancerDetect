@@ -27,28 +27,17 @@ import SimpleITK as sitk
 
 
 # 2d data labeling을 위해 각 roi 영역의 xcenter, ycenter, w, h를 txt 파일로 저장
+# 기존의 roi가 한줄씩 표시된 라벨 데이터에 lymph node 데이터가 존재한다면 추가적으로 라벨링 해준다.
 
 
 def GetYoloLabel(fPath):
     # ctList = glob.glob(fPath + 'CT_Cut.nii.gz')
-    roiList = glob.glob(fPath + 'ROI_cut.nii.gz')
-    #     lymphList = glob.glob(fPath + '*nestle_cut.nii.gz')
+    roi_list = glob.glob(fPath + 'ROI_cut.nii.gz')
+    lymph_list = glob.glob(fPath + '*nestle_cut.nii.gz')
 
-    # img_ct = sitk.ReadImage(ctList[0])
-    # img_ct_data = sitk.GetArrayFromImage(img_ct)
-    # img_pet = sitk.ReadImage(petList[0])
-    # img_pet_data = sitk.GetArrayFromImage(img_pet)
-    img_roi = sitk.ReadImage(roiList[0])
+    img_roi = sitk.ReadImage(roi_list[0])
     img_roi_data = sitk.GetArrayFromImage(img_roi)
-    # print('img idx = ', np.shape(img_roi_data))
-    # print('img idx 0 = ', np.shape(img_roi_data[0]))
-
-    # print('roi shape = ', np.shape(img_roi_data))
-    #     print(img_roi_data[50,50,:])
     nzero = img_roi_data.nonzero()
-    # print('nzero = ',nzero)
-    # print('nzero shape = ', np.shape(nzero))
-    # print('nonzero z index = ', nzero[0])
     new_nzero_z = []
     for i in nzero[0]:
         if i not in new_nzero_z:
@@ -123,9 +112,6 @@ def GetYoloLabel(fPath):
         #         pass
 
 
-# foldList = glob.glob('E:/HSE/PyTorch-YOLOv3/data/temp/images/test/*/')
-# foldList = glob.glob('E:/HSE/PyTorch-YOLOv3/wholedata/images/train/*/')
-# foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
