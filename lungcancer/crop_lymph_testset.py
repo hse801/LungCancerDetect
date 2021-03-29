@@ -28,17 +28,17 @@ def CropImage(fPath, patient_num):
     ctList = glob.glob(fPath + 'CT*/2*.nii.gz')
     petList = glob.glob(fPath + 'WT*/*.nii.gz')
     lungList = glob.glob(fPath + 'Lung_seg_img.nii.gz')
-    roiList = glob.glob(fPath + 'C1*_nestle.nii.gz')
+    # roiList = glob.glob(fPath + 'C1*_nestle.nii.gz')
 
-    if len(roiList) != 1:
-        print('No Roi')
-        return
+    # if len(roiList) == 0:
+    #     print('No Roi')
+    #     return
 
-    if len(ctList) != 1 or len(petList) != 1:
+    if len(ctList) == 0 or len(petList) == 0:
         print('No CT or PET')
         return
 
-    if len(lungList) != 1:
+    if len(lungList) == 0:
         print('No lung data')
         return
 
@@ -46,7 +46,7 @@ def CropImage(fPath, patient_num):
     img_ct_data = sitk.GetArrayFromImage(img_ct)
     img_pet = sitk.ReadImage(petList[0])
     img_pet_data = sitk.GetArrayFromImage(img_pet)
-    img_roi = sitk.ReadImage(roiList[0])
+    # img_roi = sitk.ReadImage(roiList[0])
 
     x_ct = np.arange(-img_ct.GetOrigin()[0], -img_ct.GetOrigin()[0] + (-img_ct.GetSpacing()[0]) * img_ct_data.shape[1],
                      step=-img_ct.GetSpacing()[0])
@@ -179,9 +179,12 @@ for i in roiPath:
 print('lymph list len = ', len(lymph_list))
 
 for i in foldList:
+    print('i = ', i)
     patient_num = i.split(os.sep)[-2]
+    count += 1
     print('For patient ', patient_num)
     if patient_num in lymph_list:
         CropImage(i, patient_num)
         count += 1
         print('Total count = ', count)
+print('total count = ', count)
