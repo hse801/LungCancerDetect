@@ -30,13 +30,13 @@ import SimpleITK as sitk
 
 
 def GetYoloLabel(fPath):
-    # ctList = glob.glob(fPath + 'CT_Cut.nii.gz')
+    # ct_list = glob.glob(fPath + 'CT_Cut.nii.gz')
     roiList = glob.glob(fPath + 'ROI_cut.nii.gz')
     #     lymphList = glob.glob(fPath + '*nestle_cut.nii.gz')
 
-    # img_ct = sitk.ReadImage(ctList[0])
+    # img_ct = sitk.ReadImage(ct_list[0])
     # img_ct_data = sitk.GetArrayFromImage(img_ct)
-    # img_pet = sitk.ReadImage(petList[0])
+    # img_pet = sitk.ReadImage(pet_list[0])
     # img_pet_data = sitk.GetArrayFromImage(img_pet)
     img_roi = sitk.ReadImage(roiList[0])
     img_roi_data = sitk.GetArrayFromImage(img_roi)

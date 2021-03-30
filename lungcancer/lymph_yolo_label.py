@@ -32,7 +32,7 @@ import SimpleITK as sitk
 
 
 def get_lymph_label(fPath):
-    # ctList = glob.glob(fPath + 'CT_Cut.nii.gz')
+    # ct_list = glob.glob(fPath + 'CT_Cut.nii.gz')
     roi_list = glob.glob(fPath + 'ROI_cut.nii.gz')
     lymph_list = glob.glob(fPath + '*_lymph_cut.nii.gz')
 
@@ -91,7 +91,9 @@ def get_lymph_label(fPath):
                 num = '{0:0>3}'.format(i)
                 print('num = ', num)
 
-                with open("CT_PET_slice" + str(num) + ".txt", "w") as f:
+                # "a" is append mode
+                # 기존의 파일의 마지막에 추가
+                with open("CT_PET_slice" + str(num) + ".txt", "a") as f:
                     f.write("1 " + str(centerX) + " ")
                     f.write(str(centerY) + " ")
                     f.write(str(w) + " ")

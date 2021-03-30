@@ -4,9 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import os
-# ctList type =  <class 'list'>
-# ctList =  ['E:/HSE/2dtempdata\\10918160\\CT_cut.nii.gz']
-# ctList[0] =  E:/HSE/2dtempdata\10918160\CT_cut.nii.gz
+# ct_list type =  <class 'list'>
+# ct_list =  ['E:/HSE/2dtempdata\\10918160\\CT_cut.nii.gz']
+# ct_list[0] =  E:/HSE/2dtempdata\10918160\CT_cut.nii.gz
 # img ct type =  <class 'numpy.ndarray'>
 # img ct data shape =  (80, 128, 160)
 

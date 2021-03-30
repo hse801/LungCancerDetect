@@ -12,10 +12,11 @@ from PIL import Image
 import os
 
 
+
 def nifti_convert(fPath):
     ct_file  = fPath + 'CT_cut.nii.gz'
     pet_file = fPath + 'PET_cut.nii.gz'
-    roi_file = fPath + 'ROI_cut.nii.gz'
+    # roi_file = fPath + 'ROI_cut.nii.gz'
     # path of txt files that contain mean, std
     data_file = fPath + 'img_data.txt'
 
@@ -60,10 +61,9 @@ def nifti_convert(fPath):
         img = Image.fromarray(data, 'RGB')
         filename = 'CT_PET_slice' + num + '.jpg'
         img.save(filename)
-        print(filename, ' saved')
+        print(filename, ' saved in ', os.getcwd())
 
-        # load_pet = np.load(fPath + 'PET-cut-slice' + num +'.npy')
-        # original_pet_slice = img_pet_data[j, :, :]
+        # load_pet = np.load(fPath + 'PET-cut-slice' + num +'.npy')        # original_pet_slice = img_pet_data[j, :, :]
         # print('data match = ', np.all(load_pet == original_pet_slice))
 
 
@@ -74,7 +74,7 @@ foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
 count = 0
 
-for i in foldList:
-    nifti_convert(i)
-    count += 1
-    print('count = ', count)
+# for i in foldList:
+#     nifti_convert(i)
+#     count += 1
+#     print('count = ', count)

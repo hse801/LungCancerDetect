@@ -49,7 +49,7 @@ def nifti_convert(fPath):
     print('ct rgb max = ', ct_rgb_data.max(), ' , pet rgb max = ', pet_rgb_data.max())
     print('ct rgb min = ', ct_rgb_data.min(), ' , pet rgb max = ', pet_rgb_data.min())
     print('ct rgb mean = ', ct_rgb_data.mean(), ' , pet rgb mean = ', pet_rgb_data.mean())
-    print('ct rgb shape = ', ct_rgb_data.shape, ' , pet rgb shae = ', pet_rgb_data.shape)
+    print('ct rgb shape = ', ct_rgb_data.shape, ' , pet rgb shape = ', pet_rgb_data.shape)
     img_roi = sitk.ReadImage(roi_file)
     img_roi_data = sitk.GetArrayFromImage(img_roi)
 
@@ -110,9 +110,9 @@ for i in foldList:
 # from PIL import Image
 # import os
 #
-# # ctList type =  <class 'list'>
-# # ctList =  ['E:/HSE/2dtempdata\\10918160\\CT_cut.nii.gz']
-# # ctList[0] =  E:/HSE/2dtempdata\10918160\CT_cut.nii.gz
+# # ct_list type =  <class 'list'>
+# # ct_list =  ['E:/HSE/2dtempdata\\10918160\\CT_cut.nii.gz']
+# # ct_list[0] =  E:/HSE/2dtempdata\10918160\CT_cut.nii.gz
 # # img ct type =  <class 'numpy.ndarray'>
 # # img ct data shape =  (80, 128, 160)
 #

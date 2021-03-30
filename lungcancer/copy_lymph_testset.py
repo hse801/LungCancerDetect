@@ -1,11 +1,5 @@
-
-# 생성된 RoiVolume 폴더 안에서 roi 파일들 꺼내오기
-
 import os
 import glob
-
-# from tqdm import tqdm_notebook
-from tqdm.notebook import tqdm
 import shutil
 
 

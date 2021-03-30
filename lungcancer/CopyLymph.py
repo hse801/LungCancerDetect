@@ -1,4 +1,4 @@
-# Data 폴더의 lymph node roi 파일 복사하기
+# Data 폴더의 lymph node roi 폴더 복사하기
 # shutil 모듈 이용
 # file from roi_path copied to dst_path
 # paste folder named RoiVolume_cut

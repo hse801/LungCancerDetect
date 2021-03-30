@@ -10,9 +10,9 @@ import SimpleITK as sitk
 
 # 2D 이미지를 이용하기 위해 cancer roi가 존재하는 부분에 대한 zslice들만 추출
 # nonzero 함수를 이용
-# ctList type =  <class 'list'>
-# ctList =  ['E:/HSE/2dtempdata\\10918160\\CT_cut.nii.gz']
-# ctList[0] =  E:/HSE/2dtempdata\10918160\CT_cut.nii.gz
+# ct_list type =  <class 'list'>
+# ct_list =  ['E:/HSE/2dtempdata\\10918160\\CT_cut.nii.gz']
+# ct_list[0] =  E:/HSE/2dtempdata\10918160\CT_cut.nii.gz
 # img ct type =  <class 'numpy.ndarray'>
 # img ct data shape =  (80, 128, 160)
 

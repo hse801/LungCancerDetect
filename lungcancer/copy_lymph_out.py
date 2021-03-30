@@ -4,7 +4,7 @@ import shutil
 
 # copytree: copy whole directory
 # copy2(src, dst): copy file with meta data
-
+# copy file out of the RoiVolume_cut folder
 
 def copy_file_out(file_path):
 
