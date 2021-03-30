@@ -7,21 +7,30 @@ import pickle
 
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/CT_PET_*.npy')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/CT_PET_*.jpg')
-file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/CT_PET_*.jpg')
+# file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
+# file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+file_list = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/imags/valid/*/CT_PET_*.jpg')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
+
 
 print('type = ', type(file_list))
 print('len = ', len(file_list))
 # print('file list = ', file_list)
 
-# os.chdir('E:/HSE/LungCancer/yolov3/data/images/')
 os.chdir('E:/HSE/LungCancerDetect/data/images/')
-f = open('lymph_valid_img.txt', 'w')
-for ele in file_list:
-    label_list = ele.replace('jpg', 'txt')
-    if os.path.getsize(label_list) != 0:
-        f.write(ele + '\n')
-f.close()
+f = open('patient_num_test_img.txt', 'w')
+for i in file_list:
+    print(f'i = {i}')
+    patient_num = i.split('\\')[-2]
+    print(f'patient_num = {patient_num}')
+    img_name = glob.glob(i + patient_num + '_slice*.jpg')
+    print(f'image name = {img_name}')
+    print(f'num of img = {len(img_name)}')
+    for ele in img_name:
+        label_list = ele.replace('jpg', 'txt')
+        if os.path.getsize(label_list) != 0:
+            f.write(ele + '\n')
+    # f.close()
 
 # print(file_list2)

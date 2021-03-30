@@ -12,14 +12,15 @@ from PIL import Image
 import os
 
 
-
 def nifti_convert(fPath):
     ct_file  = fPath + 'CT_cut.nii.gz'
     pet_file = fPath + 'PET_cut.nii.gz'
     # roi_file = fPath + 'ROI_cut.nii.gz'
     # path of txt files that contain mean, std
     data_file = fPath + 'img_data.txt'
-
+    # print(f'fPath = {fPath}')
+    patient_num = fPath.split('\\')[-2]
+    print(f'patient_num = {patient_num}')
     # get mean, std values to standardization
     f = open(data_file, 'r')
     nums = [float(x) for x in f.read().split()]
@@ -54,12 +55,14 @@ def nifti_convert(fPath):
         pet_slice = pet_rgb_data[j, :, :]
         ratio_overlay1 = 0.8
         ratio_overlay2 = 0.6
-        data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255) , ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+        data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
+                         ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
 
         # data = np.stack((ct_slice, ct_slice, pet_slice), axis=-1)
         data = data.astype(np.uint8)
         img = Image.fromarray(data, 'RGB')
-        filename = 'CT_PET_slice' + num + '.jpg'
+        # add patient number in file name
+        filename = patient_num + '_slice' + num + '.jpg'
         img.save(filename)
         print(filename, ' saved in ', os.getcwd())
 
@@ -74,7 +77,7 @@ foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
 count = 0
 
-# for i in foldList:
-#     nifti_convert(i)
-#     count += 1
-#     print('count = ', count)
+for i in foldList:
+    nifti_convert(i)
+    count += 1
+    print('count = ', count)
