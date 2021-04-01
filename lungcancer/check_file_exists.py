@@ -1,6 +1,9 @@
 import os
 import glob
 
+# RoiVolume_cut에 파일이 존재하는지 확인
+# 복사 안된 것 있는지 확인
+
 
 def check_file(file_path):
     if os.path.isdir(file_path + '/RoiVolume_cut'):

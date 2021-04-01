@@ -15,9 +15,9 @@ def CopyLymph(roi_path, patient_list):
         lymph_roi_list = os.listdir('C:/Users/Bohye/data/' + fName + '/RoiVolume/')
         print('lymph roi list = ', lymph_roi_list)
         for f in lymph_roi_list:
-            file_to_copy = 'C:/Users/Bohye/data/' + fName + '/RoiVolume/' + f
+            file_to_copy = 'E:/HSE/lymphdata/' + fName + '/RoiVolume_cut/' + f
             print('file to copy = ', file_to_copy)
-            shutil.copy2(file_to_copy, dst_path)
+            # shutil.copy2(file_to_copy, dst_path)
 
 
 dstPath = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
