@@ -42,10 +42,10 @@ imgPath = glob.glob('E:/HSE/PyTorch-YOLOv3/wholedata/images/train/*/')
 #     patient_num = i.split(os.sep)[-2]
 #     patient_list.append(patient_num)
 #
-# print('patient num = ', patient_list)
+# print('lymph_only_patient num = ', patient_list)
 
 for i in imgPath:
     print('i = ', i)
     patient_num = i.split(os.sep)[-2]
-    print('patient num = ', patient_num)
+    print('lymph_only_patient num = ', patient_num)
     CopyLymph(i, patient_num)

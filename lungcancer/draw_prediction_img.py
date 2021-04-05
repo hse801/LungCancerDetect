@@ -105,7 +105,7 @@ count = 0
 patient_idx = 0
 patient_list = []
 
-# get patient list
+# get lymph_only_patient list
 for i in img_list:
     img_path = i.rstrip()
     patient_num = img_path.split('\\')[-2]

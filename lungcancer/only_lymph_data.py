@@ -15,8 +15,8 @@ from nii_convert_whole import nifti_convert
 # 4. paste to training data folder
 #
 # create CT_cut and PET_cut files
-# for the patient who don't have lung_seg
-# patient who only have lymph roi
+# for the lymph_only_patient who don't have lung_seg
+# lymph_only_patient who only have lymph roi
 # set certain range of x,y,z to cut
 def crop_ct_pet(patient_num):
     patient_path = 'F:/03. DataSet/Lung Cancer (PET-CT)/SNUH_lung/' + patient_num + '/'
@@ -93,7 +93,7 @@ only_lymph_patient = []
 file_path = glob.glob('F:/03. DataSet/Lung Cancer (PET-CT)/SNUH_lung/*/')
 for i in file_path:
     patient_num = i.split(os.sep)[-2]
-    print('For patient ', patient_num)
+    print('For lymph_only_patient ', patient_num)
     if patient_num in lymph_list:
         ct_list = glob.glob(i + 'CT*/2*.nii.gz')
         pet_list = glob.glob(i + 'WT*/*.nii.gz')
@@ -109,8 +109,8 @@ for i in file_path:
             count += 1
 
         # get_only_lymph(i)
-print(f'only lymph patient = {only_lymph_patient}')
-print(f'only lymph patient num = {len(only_lymph_patient)}')
+print(f'only lymph lymph_only_patient = {only_lymph_patient}')
+print(f'only lymph lymph_only_patient num = {len(only_lymph_patient)}')
 print(f'Total count = {count}')
 
 
@@ -133,7 +133,7 @@ def Normal(fPath):
     k.close()
     print('img_data file saved in ', os.getcwd())
 
-# copy folder of patient who only have lymph node
+# copy folder of lymph_only_patient who only have lymph node
 # contain lymph roi, CT_cut, PET_cut, img_data.txt
 # move all 48 patients to train data folder
 

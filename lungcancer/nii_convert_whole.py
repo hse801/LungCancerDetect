@@ -61,7 +61,7 @@ def nifti_convert(fPath):
         # data = np.stack((ct_slice, ct_slice, pet_slice), axis=-1)
         data = data.astype(np.uint8)
         img = Image.fromarray(data, 'RGB')
-        # add patient number in file name
+        # add lymph_only_patient number in file name
         filename = patient_num + '_slice' + num + '.jpg'
         img.save(filename)
         print(filename, ' saved in ', os.getcwd())

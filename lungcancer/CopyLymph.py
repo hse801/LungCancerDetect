@@ -32,7 +32,7 @@ count = 0
 
 for i in dstPath:
     dst_patient_num = i.split(os.sep)[-2]
-    print('patient num = ', dst_patient_num)
+    print('lymph_only_patient num = ', dst_patient_num)
     patient_list.append(dst_patient_num)
     count += 1
 print('total count = ', count)

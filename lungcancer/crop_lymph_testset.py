@@ -90,8 +90,8 @@ def CropImage(fPath, patient_num):
         # print('i = ', i)
         # print('i.split(os.sep)[-1] = ', i.split('/')[-2])
         # lymph_patient = lymph_path.split('/')[3]
-        # print('lymph patient = ', lymph_patient)
-        # print('patient num = ', patient_num)
+        # print('lymph lymph_only_patient = ', lymph_patient)
+        # print('lymph_only_patient num = ', patient_num)
         # print('is lymph_patient == patient_num : ', lymph_patient == patient_num)
         for j in lymph_list:
             full_path = lymph_path + j
@@ -203,8 +203,8 @@ def CropImage(fPath, patient_num):
 #     # print('i = ', i)
 #     # print('i.split(os.sep)[-1] = ', i.split('/')[-2])
 #     lymph_patient = lymph_path.split('/')[3]
-#     print('lymph patient = ', lymph_patient)
-#     print('patient num = ', patient_num)
+#     print('lymph lymph_only_patient = ', lymph_patient)
+#     print('lymph_only_patient num = ', patient_num)
 #     print('is lymph_patient == patient_num : ', lymph_patient == patient_num)
 #     print('check 3')
 #
@@ -251,7 +251,7 @@ for i in foldList:
     print('i = ', i)
     patient_num = i.split(os.sep)[-2]
     count += 1
-    print('For patient ', patient_num)
+    print('For lymph_only_patient ', patient_num)
     if patient_num in lymph_list:
         CropImage(i, patient_num)
         count += 1

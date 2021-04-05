@@ -131,7 +131,7 @@ def plot_images(infiles, fname, paths=None, names=None, max_size=640, max_subplo
         mosaic = cv2.resize(mosaic, (int(ns * w * r), int(ns * h * r)), interpolation=cv2.INTER_AREA)
         # cv2.imwrite(fname, cv2.cvtColor(mosaic, cv2.COLOR_BGR2RGB))  # cv2 save
         print('PIL save to', fname, 'image shape', mosaic.shape)
-        os.chdir('E:/HSE/LungCancerDetect/runs/test/exp37/')
+        os.chdir('E:/HSE/LungCancerDetect/runs/test/exp43/')
         Image.fromarray(mosaic).save(fname)  # PIL save
         # cv2.imshow(fname, mosaic)
         # cv2.waitKey(0)
@@ -146,7 +146,7 @@ def read_targets(img_path, ground_truth):
         label_path = 'E:/HSE/LungCancerDetect/data/testset/'+patient_name+'/' + img_file_name.replace('jpg', 'txt')
     else:
         # label path of prediction
-        label_path = 'E:/HSE/LungCancerDetect/runs/test/exp37/labels/' + img_file_name.replace('jpg', 'txt')
+        label_path = 'E:/HSE/LungCancerDetect/runs/test/exp43/labels/' + img_file_name.replace('jpg', 'txt')
     targets = []
     if os.path.isfile(label_path):
         labels = open(label_path, 'r')
@@ -188,12 +188,12 @@ for patient in lines:
     for i in range(0, len(lines_per_patient), 8):
         # patient_num = lines_per_patient[i:i+9].split('\\')[-1]
         file_name = lines_per_patient[0].split('\\')[-2] + '_' + str(i) + '.jpg'
-        plot_images(lines_per_patient[i:i+8],names=names, paths=lines_per_patient[i:i+8], fname=file_name)
+        plot_images(lines_per_patient[i:i+8], names=names, paths=lines_per_patient[i:i+8], fname=file_name)
         # plot_images()
-        # print(f'patient num = {patient_num}')
+        # print(f'lymph_only_patient num = {patient_num}')
         # print(f'i = {i}')
-        # print(f'for patient {patient}')
-        # print(f'lines per patient = {lines_per_patient[i:i+9]}')
+        # print(f'for lymph_only_patient {lymph_only_patient}')
+        # print(f'lines per lymph_only_patient = {lines_per_patient[i:i+9]}')
         # print(f'length = {len(lines_per_patient[i:i+9])}')
 
 
