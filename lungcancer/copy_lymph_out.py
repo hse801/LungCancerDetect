@@ -20,8 +20,8 @@ def copy_file_out(file_path):
         print('file copied from ', lymph_roi_path, ' to ', file_path)
 
 file_path = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
-# file_path = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
-# file_path = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
+# img_path = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
+# img_path = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
 
 for i in file_path:
     copy_file_out(i)

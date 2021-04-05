@@ -41,60 +41,60 @@ def get_lymph_label(fPath):
     patient_num = fPath.split('\\')[-2]
     print(f'patient_num = {patient_num}')
 
-    if len(roi_list) >= 1:
-        print('ROI_cut exists in ', fPath)
-        img_roi = sitk.ReadImage(roi_list[0])
-        img_roi_data = sitk.GetArrayFromImage(img_roi)
-        nzero = img_roi_data.nonzero()
-        new_nzero_z = []
-        for i in nzero[0]:
-            if i not in new_nzero_z:
-                new_nzero_z.append(i)
-        # print('new nonzero = ', new_nzero_z)
-
-        start_idx = new_nzero_z[0]
-        end_idx = new_nzero_z[-1]
-        print(f'start idx = {start_idx}, end idx = {end_idx}')
-        for i in range(np.shape(img_roi_data)[0]):
-            # if start_idx > i or end_idx < i:
-            #     os.chdir(fPath)
-            #     num = '{0:0>3}'.format(i)
-            #     with open(patient_num + "_slice" + str(num) + ".txt", "w") as f:
-            #         pass
-            if start_idx <= i <= end_idx:
-                roi_zslice = img_roi_data[i, :, :]
-                nzero = roi_zslice.nonzero()
-                # print('nzero = ', nzero)
-                new_nzero_x = []
-                new_nzero_y = []
-                for j in nzero[1]:
-                    if j not in new_nzero_x:
-                        new_nzero_x.append(j)
-                for k in nzero[0]:
-                    if k not in new_nzero_y:
-                        new_nzero_y.append(k)
-                # normalize with image width and height (160x128)
-                centerX = ((min(new_nzero_x) + max(new_nzero_x)) / 2)/160
-                centerY = 1 - (((min(new_nzero_y) + max(new_nzero_y)) / 2)/128)
-                # centerY = 1 - centerY
-                w = (max(new_nzero_x) - min(new_nzero_x))/160
-                h = (max(new_nzero_y) - min(new_nzero_y))/128
-                os.chdir(fPath)
-                num = '{0:0>3}'.format(i)
-                # print('num = ', num)
-
-                with open(patient_num + "_slice" + str(num) + ".txt", "w") as f:
-                    f.write("0 " + str(centerX) + " ")
-                    f.write(str(centerY) + " ")
-                    f.write(str(w) + " ")
-                    f.write(str(h) + " " + "\n")
-                print('Have ROI_cut and in roi')
-            # roi에 해당하지 않는 z 인덱스의 경우 label 없는 빈 txt 파일 생성
-            else:
-                os.chdir(fPath)
-                num = '{0:0>3}'.format(i)
-                with open(patient_num + "_slice" + str(num) + ".txt", "w") as f:
-                    pass
+    # if len(roi_list) >= 1:
+    #     print('ROI_cut exists in ', fPath)
+    #     img_roi = sitk.ReadImage(roi_list[0])
+    #     img_roi_data = sitk.GetArrayFromImage(img_roi)
+    #     nzero = img_roi_data.nonzero()
+    #     new_nzero_z = []
+    #     for i in nzero[0]:
+    #         if i not in new_nzero_z:
+    #             new_nzero_z.append(i)
+    #     # print('new nonzero = ', new_nzero_z)
+    #
+    #     start_idx = new_nzero_z[0]
+    #     end_idx = new_nzero_z[-1]
+    #     print(f'start idx = {start_idx}, end idx = {end_idx}')
+    #     for i in range(np.shape(img_roi_data)[0]):
+    #         # if start_idx > i or end_idx < i:
+    #         #     os.chdir(fPath)
+    #         #     num = '{0:0>3}'.format(i)
+    #         #     with open(patient_num + "_slice" + str(num) + ".txt", "w") as f:
+    #         #         pass
+    #         if start_idx <= i <= end_idx:
+    #             roi_zslice = img_roi_data[i, :, :]
+    #             nzero = roi_zslice.nonzero()
+    #             # print('nzero = ', nzero)
+    #             new_nzero_x = []
+    #             new_nzero_y = []
+    #             for j in nzero[1]:
+    #                 if j not in new_nzero_x:
+    #                     new_nzero_x.append(j)
+    #             for k in nzero[0]:
+    #                 if k not in new_nzero_y:
+    #                     new_nzero_y.append(k)
+    #             # normalize with image width and height (160x128)
+    #             centerX = ((min(new_nzero_x) + max(new_nzero_x)) / 2)/160
+    #             centerY = 1 - (((min(new_nzero_y) + max(new_nzero_y)) / 2)/128)
+    #             # centerY = 1 - centerY
+    #             w = (max(new_nzero_x) - min(new_nzero_x))/160
+    #             h = (max(new_nzero_y) - min(new_nzero_y))/128
+    #             os.chdir(fPath)
+    #             num = '{0:0>3}'.format(i)
+    #             # print('num = ', num)
+    #
+    #             with open(patient_num + "_slice" + str(num) + ".txt", "w") as f:
+    #                 f.write("0 " + str(centerX) + " ")
+    #                 f.write(str(centerY) + " ")
+    #                 f.write(str(w) + " ")
+    #                 f.write(str(h) + " " + "\n")
+    #             print('Have ROI_cut and in roi')
+    #         # roi에 해당하지 않는 z 인덱스의 경우 label 없는 빈 txt 파일 생성
+    #         else:
+    #             os.chdir(fPath)
+    #             num = '{0:0>3}'.format(i)
+    #             with open(patient_num + "_slice" + str(num) + ".txt", "w") as f:
+    #                 pass
                 # print("Have ROI_cut but not roi")
     # elif len(roi_list) == 0:
     #     for j in range(80):
@@ -174,8 +174,8 @@ def get_lymph_label(fPath):
     #         print(f'Create label for empty images in {fPath} named {patient_num}_slice{str(num)}.txt')
 
 
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
-foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
 count = 0

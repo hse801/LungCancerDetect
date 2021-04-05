@@ -16,8 +16,8 @@ def check_file(file_path):
 
 
 file_path = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
-# file_path = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
-# file_path = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
+# img_path = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+# img_path = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
 
 for i in file_path:
     check_file(i)
