@@ -1,15 +1,15 @@
 import os
 import glob
+import numpy as np
+import SimpleITK as sitk
 
 
-def check_file(file_path):
-    if os.path.isdir(file_path + '/RoiVolume_cut'):
-        # print('RoiVolume_cut exists')
-        lymph_list = os.listdir(file_path + '/RoiVolume_cut')
-        # print(f'lymph list = {lymph_list}')
-        if len(lymph_list) == 0:
-            print(f'Lymph list is empty')
-            print(file_path)
+def get_depth(file_path):
+    ct_list = glob.glob(file_path + 'CT_cut.nii.gz')
+    img_ct = sitk.ReadImage(ct_list[0])
+    depth = img_ct.GetDepth()
+    print(f'depth = {depth}')
+    print(f'depth type = {type(depth)}')
 
 
 file_path = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
@@ -17,4 +17,4 @@ file_path = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
 # img_path = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
 
 for i in file_path:
-    check_file(i)
+    get_depth(i)

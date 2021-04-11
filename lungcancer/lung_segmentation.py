@@ -1,0 +1,39 @@
+from lungmask import mask
+import SimpleITK as sitk
+import os
+import glob
+import torch
+
+# create lung segmentation nifti file
+# code from https://github.com/JoHof/lungmask
+# 기존의 파일들은 오른쪽 lung만 있어서 전부 다시 생성하자
+
+
+def lung_seg(file_path):
+    ct_file = file_path + 'CT_cut.nii.gz'
+    print(f'file path = {file_path}')
+    # ct_list = glob.glob(i + 'CT*/2*.nii.gz')
+    input_image = sitk.ReadImage(ct_file)
+    print(f'input image type = {type(input_image)}')
+    seg_arr = mask.apply(input_image)  # default model is U-net(R231)
+    seg_img = sitk.GetImageFromArray(seg_arr)
+    print(f'seg type = {type(seg_img)}')
+    print(f'seg = {seg_img}')
+    file_name = str(file_path.split('/')[-2]) + '_Lung_seg.nii.gz'
+    print(f'file_name = {file_name}')
+    os.chdir(file_path)
+    sitk.WriteImage(seg_img, fileName=file_name)
+
+
+folder_path = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
+
+
+def run():
+    torch.multiprocessing.freeze_support()
+    print('loop')
+
+
+if __name__ == '__main__':
+    # run()
+    for i in folder_path:
+        lung_seg(i)
