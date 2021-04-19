@@ -53,8 +53,7 @@ def nifti_convert(fPath):
     print('ct rgb shape = ', ct_rgb_data.shape, ' , pet rgb shape = ', pet_rgb_data.shape)
     img_roi = sitk.ReadImage(roi_file)
     img_roi_data = sitk.GetArrayFromImage(img_roi)
-
-    img_lung = sitk.ReadImage(lung_file)
+    img_lung = sitk.ReadImage(lung_file[0])
     img_lung_data = sitk.GetArrayFromImage(img_lung)
 
     nzero = img_roi_data.nonzero()
@@ -67,7 +66,7 @@ def nifti_convert(fPath):
     end_idx = new_nzero[-1]
 
     j = start_idx
-    for j in range(start_idx, end_idx + 1):
+    for j in range(80):
         num = '{0:0>3}'.format(j)
         os.chdir(fPath)
         ct_slice = ct_rgb_data[j, :, :]
@@ -81,9 +80,11 @@ def nifti_convert(fPath):
         # data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255) , ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
         # data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
         #                  ct_slice * ratio_overlay2, lung_slice), axis=-1)
-        data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
-                         ct_slice * ratio_overlay2, np.clip(ct_slice * ratio_overlay2 + lung_slice, 0, 255)), axis=-1)
+        # data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
+        #                  ct_slice * ratio_overlay2, np.clip(ct_slice * ratio_overlay2 + lung_slice, 0, 255)), axis=-1)
         # data = np.stack((pet_slice, ct_slice, lung_slice), axis=-1)
+        data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
+                         ct_slice * ratio_overlay2, np.clip(ct_slice * ratio_overlay2 + lung_slice * 0.3, 0, 255)), axis=-1)
 
         data = data.astype(np.uint8)
         img = Image.fromarray(data, 'RGB')
