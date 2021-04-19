@@ -1,7 +1,3 @@
-<a href="https://apps.apple.com/app/id1452689527" target="_blank">
-<img src="https://user-images.githubusercontent.com/26833433/99805965-8f2ca800-2b3d-11eb-8fad-13a96b222a23.jpg" width="1000"></a>
-&nbsp
-
 <a href="https://github.com/ultralytics/yolov3/actions"><img src="https://github.com/ultralytics/yolov3/workflows/CI%20CPU%20testing/badge.svg" alt="CI CPU testing"></a>
 
 BRANCH NOTICE: The [ultralytics/yolov3](https://github.com/ultralytics/yolov3) repository is now divided into two branches:
