@@ -9,7 +9,7 @@ import pickle
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/CT_PET_*.jpg')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
-file_list = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/')
+file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/imags/valid/*/CT_PET_*.jpg')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
 

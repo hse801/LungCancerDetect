@@ -203,8 +203,8 @@ def test(data,
                                     break
 
             # Append statistics (correct, conf, pcls, tcls)
-            print(f'(correct.cpu() = {correct.cpu()}, pred[:, 4].cpu() = {pred[:, 4].cpu()}, '
-                  f'pred[:, 5].cpu() = {pred[:, 5].cpu()}, tcls = {tcls})')
+            # print(f'(correct.cpu() = {correct.cpu()}, pred[:, 4].cpu() = {pred[:, 4].cpu()}, '
+            #       f'pred[:, 5].cpu() = {pred[:, 5].cpu()}, tcls = {tcls})')
             stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
 
         # Plot images
@@ -217,8 +217,8 @@ def test(data,
 
     # Compute statistics
     stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
-    print(f'stats = {stats}')
-    print(f'stats shape = {np.shape(stats)}')
+    # print(f'stats = {stats}')
+    # print(f'stats shape = {np.shape(stats)}')
     if len(stats) and stats[0].any():
         p, r, ap, f1, ap_class = ap_per_class(*stats, plot=plots, save_dir=save_dir, names=names)
         p, r, ap50, ap = p[:, 0], r[:, 0], ap[:, 0], ap.mean(1)  # [P, R, AP@0.5, AP@0.5:0.95]
