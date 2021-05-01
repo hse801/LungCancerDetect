@@ -18,11 +18,11 @@ import os
 
 
 def nifti_convert(fPath):
-    ct_file  = fPath + 'CT_cut.nii.gz'
+    ct_file = fPath + 'CT_cut.nii.gz'
     pet_file = fPath + 'PET_cut.nii.gz'
-    roi_file = fPath + 'ROI_cut.nii.gz'
     # path of txt files that contain mean, std
     data_file = fPath + 'img_data.txt'
+    roi_list = glob.glob(fPath + 'ROI_cut.nii.gz')
 
     # get mean, std values to standardization
     f = open(data_file, 'r')
@@ -44,7 +44,7 @@ def nifti_convert(fPath):
     pet_rgb_data = pet_rgb_data[::-1, :, ::-1]
     lymph_list = glob.glob(fPath + '*_lymph_cut.nii.gz')
 
-    patient_num = fPath.split('/')[-2]
+    patient_num = fPath.split('\\')[-2]
     print(f'patient_num = {patient_num}')
 
     print('ct max = ', img_ct_data.max(), ' , pet max = ', img_pet_data.max())
@@ -54,45 +54,47 @@ def nifti_convert(fPath):
     print('ct rgb min = ', ct_rgb_data.min(), ' , pet rgb max = ', pet_rgb_data.min())
     print('ct rgb mean = ', ct_rgb_data.mean(), ' , pet rgb mean = ', pet_rgb_data.mean())
     print('ct rgb shape = ', ct_rgb_data.shape, ' , pet rgb shape = ', pet_rgb_data.shape)
-    img_roi = sitk.ReadImage(roi_file)
-    img_roi_data = sitk.GetArrayFromImage(img_roi)
-    print(f'img_roi shape = {img_roi_data.shape}')
 
-    nzero = img_roi_data.nonzero()
-    new_nzero = []
+    if len(roi_list) >= 1:
+        img_roi = sitk.ReadImage(roi_list[0])
+        img_roi_data = sitk.GetArrayFromImage(img_roi)
+        print(f'img_roi shape = {img_roi_data.shape}')
 
-    for i in nzero[2]:
-        if i not in new_nzero:
-            new_nzero.append(i)
+        nzero = img_roi_data.nonzero()
+        new_nzero = []
 
-    start_idx = min(new_nzero)
-    end_idx = max(new_nzero)
-    print(f'nzero = {nzero}')
-    # print(f'nzero shape = {nzero.shape}')
-    print(f'new nzero = {new_nzero}')
-    print(f'start idx = {start_idx}, end idx = {end_idx}')
-    j = start_idx
+        for i in nzero[2]:
+            if i not in new_nzero:
+                new_nzero.append(i)
 
-    print(f'fPath = {fPath}')
+        start_idx = min(new_nzero)
+        end_idx = max(new_nzero)
+        print(f'nzero = {nzero}')
+        # print(f'nzero shape = {nzero.shape}')
+        print(f'new nzero = {new_nzero}')
+        print(f'start idx = {start_idx}, end idx = {end_idx}')
+        j = start_idx
 
-    for j in range(start_idx, end_idx + 1):
-        num = '{0:0>3}'.format(j)
-        os.chdir(fPath)
-        ct_slice = ct_rgb_data[:, :, j]
-        pet_slice = pet_rgb_data[:, :, j]
-        print(f'ct slice = {ct_slice.shape}')
-        # zero_arr = np.zeros((128, 160))
-        # data = np.stack((ct_slice, ct_slice, pet_slice), axis=-1)
-        # data = np.stack((ct_slice, pet_slice, zero_arr), axis=-1)
-        ratio_overlay1 = 0.8
-        ratio_overlay2 = 0.6
-        data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255), ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+        print(f'fPath = {fPath}')
 
-        data = data.astype(np.uint8)
-        img = Image.fromarray(data, 'RGB')
-        filename = str(patient_num) + '_median_slice' + num + '.jpg'
-        img.save(filename)
-        print(filename, ' saved')
+        for j in range(start_idx, end_idx + 1):
+            num = '{0:0>3}'.format(j)
+            os.chdir(fPath)
+            ct_slice = ct_rgb_data[:, :, j]
+            pet_slice = pet_rgb_data[:, :, j]
+            print(f'ct slice = {ct_slice.shape}')
+            # zero_arr = np.zeros((128, 160))
+            # data = np.stack((ct_slice, ct_slice, pet_slice), axis=-1)
+            # data = np.stack((ct_slice, pet_slice, zero_arr), axis=-1)
+            ratio_overlay1 = 0.8
+            ratio_overlay2 = 0.6
+            data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255), ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+
+            data = data.astype(np.uint8)
+            img = Image.fromarray(data, 'RGB')
+            filename = str(patient_num) + '_median_slice' + num + '.jpg'
+            img.save(filename)
+            print(filename, ' saved')
 
     # if lymph roi file exist
     if lymph_list:
@@ -140,7 +142,7 @@ def get_labels(fPath):
     roi_list = glob.glob(fPath + 'ROI_cut.nii.gz')
     lymph_list = glob.glob(fPath + '*_lymph_cut.nii.gz')
 
-    patient_num = fPath.split('/')[-2]
+    patient_num = fPath.split('\\')[-2]
     print(f'patient_num = {patient_num}')
 
     if len(roi_list) >= 1:
@@ -253,12 +255,12 @@ def get_labels(fPath):
 
                     print(f'min(new_nzero_w) = {min(new_nzero_w)}, max(new_nzero_w) = {max(new_nzero_w)}')
                     print(f'min(new_nzero_h) = {min(new_nzero_h)}, max(new_nzero_h) = {max(new_nzero_h)}')
-                    print(f'np.shape(img_roi_data)[1] = {np.shape(img_roi_data)[1]}, np.shape(img_roi_data)[0] = {np.shape(img_roi_data)[0]}')
-                    centerX = ((min(new_nzero_w) + max(new_nzero_w)) / 2)/np.shape(img_roi_data)[1]
-                    centerY = 1 - (((min(new_nzero_h) + max(new_nzero_h)) / 2)/np.shape(img_roi_data)[0])
+                    # print(f'np.shape(img_roi_data)[1] = {np.shape(img_roi_data)[1]}, np.shape(img_roi_data)[0] = {np.shape(img_roi_data)[0]}')
+                    centerX = ((min(new_nzero_w) + max(new_nzero_w)) / 2)/np.shape(img_lymph_data)[1]
+                    centerY = 1 - (((min(new_nzero_h) + max(new_nzero_h)) / 2)/np.shape(img_lymph_data)[0])
                     # centerY = 1 - centerY
-                    w = (max(new_nzero_w) - min(new_nzero_w))/np.shape(img_roi_data)[1]
-                    h = (max(new_nzero_h) - min(new_nzero_h))/np.shape(img_roi_data)[0]
+                    w = (max(new_nzero_w) - min(new_nzero_w))/np.shape(img_lymph_data)[1]
+                    h = (max(new_nzero_h) - min(new_nzero_h))/np.shape(img_lymph_data)[0]
 
                     os.chdir(fPath)
                     num = '{0:0>3}'.format(i)
@@ -280,9 +282,9 @@ def get_labels(fPath):
 
 
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
-foldList = glob.glob('E:/HSE/LungCancerDetect/one/45730513/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/one/45730513/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
 # foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/valid/45706084/')
 count = 0
@@ -292,3 +294,4 @@ for i in foldList:
     get_labels(i)
     count += 1
     print('count = ', count)
+    # break
