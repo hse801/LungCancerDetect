@@ -159,6 +159,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
 
     # Image sizes
     gs = int(model.stride.max())  # grid size (max stride)
+    print(f'grid size = {gs}')
     nl = model.model[-1].nl  # number of detection layers (used for scaling hyp['obj'])
     imgsz, imgsz_test = [check_img_size(x, gs) for x in opt.img_size]  # verify imgsz are gs-multiples
 

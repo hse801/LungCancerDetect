@@ -48,8 +48,11 @@ def plot_images(infiles, fname, paths=None, names=None, max_size=640, max_subplo
         print('img', img.shape)
         images.append(img)
 
-    tl = 1  # line thickness
-    tf = max(tl - 1, 1)  # font thickness
+    tl = 2  # line thickness
+    tf = 2  # font thickness
+    # default
+    # tl = 3  # line thickness
+    # tf = max(tl - 1, 1)  # font thickness
     h, w = images[0].shape[:2]  # batch size, _, height, width
     bs = 16
     bs = min(bs, max_subplots)  # limit plot images
@@ -110,6 +113,8 @@ def plot_images(infiles, fname, paths=None, names=None, max_size=640, max_subplo
                 if i % 2 == 0 or conf[j] > 0.25:  # 0.25 conf thresh
                     label = '%s' % cls if i % 2 == 0 else '%s' % cls # without confidence
                     # label = '%s' % cls if i % 2 == 0 else '%s %.1f' % (cls, conf[j]) # print confidence
+                    # if label == 'cancer':
+                    #     label = 'primary'
                     plot_one_box(box, mosaic, label=label, color=color, line_thickness=tl)
 
         # Draw image filename labels
@@ -132,7 +137,7 @@ def plot_images(infiles, fname, paths=None, names=None, max_size=640, max_subplo
         mosaic = cv2.resize(mosaic, (int(ns * w * r), int(ns * h * r)), interpolation=cv2.INTER_AREA)
         # cv2.imwrite(fname, cv2.cvtColor(mosaic, cv2.COLOR_BGR2RGB))  # cv2 save
         print('PIL save to', fname, 'image shape', mosaic.shape)
-        os.chdir('E:/HSE/Lung_Pred_Image_Test/without_conf/') # 생성한 이미지 파일 저장되는 경로
+        os.chdir('E:/HSE/without_conf/test/') # 생성한 이미지 파일 저장되는 경로
         Image.fromarray(mosaic).save(fname)  # PIL save
         # cv2.imshow(fname, mosaic)
         # cv2.waitKey(0)
@@ -147,7 +152,8 @@ def read_targets(img_path, ground_truth):
         label_path = 'E:/HSE/LungCancerDetect/data/images/test/'+ patient_name+'/' + img_file_name.replace('jpg', 'txt')
     else:
         # label path of prediction
-        label_path = 'E:/HSE/LungCancerDetect/runs/test/exp49/labels/' + img_file_name.replace('jpg', 'txt')
+        # test exp 43, valid exp 44, train exp45
+        label_path = 'E:/HSE/LungCancerDetect/runs/test/exp44/labels/' + img_file_name.replace('jpg', 'txt')
     targets = []
     if os.path.isfile(label_path):
         labels = open(label_path, 'r')
@@ -183,7 +189,7 @@ def split_by_patient(lines):
 # 환자 목록 가져오기
 os.chdir('E:/HSE/LungCancerDetect/data/images/')
 lines = split_by_patient(open('patient_num_test_img.txt', 'r').readlines())
-names = {0: 'cancer', 1: 'lymph'}
+names = {0: 'primary', 1: 'lymph'}
 
 for patient in lines:
     lines_per_patient = lines[patient]
