@@ -8,6 +8,7 @@
 # frontal plane: fixed y value -> nzero[1], [:, j, :]
 # median plane: fixed x value -> nzero[2], [:, :, j]
 
+
 import SimpleITK as sitk
 import glob
 import numpy as np
@@ -34,13 +35,13 @@ def nifti_convert(fPath):
     img_ct_data = (img_ct_data - nums[0]) / (nums[1] + 1e-8)
     img_ct_data[img_ct_data > 3] = 3
     ct_rgb_data = ((img_ct_data - img_ct_data.min()) / (img_ct_data.max() - img_ct_data.min()) * 255)
-    ct_rgb_data = ct_rgb_data[::-1, ::-1, :]
+    ct_rgb_data = ct_rgb_data[::-1, :, ::-1]
     img_pet = sitk.ReadImage(pet_file)
     img_pet_data = sitk.GetArrayFromImage(img_pet)
     img_pet_data = (img_pet_data - nums[2]) / (nums[3] + 1e-8)
     # img_pet_data[img_pet_data > 3] = 3
     pet_rgb_data = ((img_pet_data - img_pet_data.min()) / (img_pet_data.max() - img_pet_data.min()) * 255)
-    pet_rgb_data = pet_rgb_data[::-1, ::-1, :]
+    pet_rgb_data = pet_rgb_data[::-1, :, ::-1]
     lymph_list = glob.glob(fPath + '*_lymph_cut.nii.gz')
 
     patient_num = fPath.split('/')[-2]
@@ -60,7 +61,7 @@ def nifti_convert(fPath):
     nzero = img_roi_data.nonzero()
     new_nzero = []
 
-    for i in nzero[1]:
+    for i in nzero[2]:
         if i not in new_nzero:
             new_nzero.append(i)
 
@@ -77,19 +78,19 @@ def nifti_convert(fPath):
     for j in range(start_idx, end_idx + 1):
         num = '{0:0>3}'.format(j)
         os.chdir(fPath)
-        ct_slice = ct_rgb_data[:, j, :]
-        pet_slice = pet_rgb_data[:, j, :]
+        ct_slice = ct_rgb_data[:, :, j]
+        pet_slice = pet_rgb_data[:, :, j]
         print(f'ct slice = {ct_slice.shape}')
         # zero_arr = np.zeros((128, 160))
         # data = np.stack((ct_slice, ct_slice, pet_slice), axis=-1)
         # data = np.stack((ct_slice, pet_slice, zero_arr), axis=-1)
         ratio_overlay1 = 0.8
         ratio_overlay2 = 0.6
-        data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255) , ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+        data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255), ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
 
         data = data.astype(np.uint8)
         img = Image.fromarray(data, 'RGB')
-        filename = str(patient_num) + '_frontal_slice' + num + '.jpg'
+        filename = str(patient_num) + '_median_slice' + num + '.jpg'
         img.save(filename)
         print(filename, ' saved')
 
@@ -102,7 +103,7 @@ def nifti_convert(fPath):
             nzero = img_lymph_data.nonzero()
             # print(f'nzero = {nzero}, type of nzero = {type(nzero)}')
             new_nzero_slice = []
-            for i in nzero[1]:
+            for i in nzero[2]:
                 if i not in new_nzero_slice:
                     new_nzero_slice.append(i)
             # print(f'new nzero = {new_nzero_slice}, type of nzero = {type(new_nzero_slice)}')
@@ -118,8 +119,8 @@ def nifti_convert(fPath):
             for j in range(start_idx, end_idx + 1):
                 num = '{0:0>3}'.format(j)
                 os.chdir(fPath)
-                ct_slice = ct_rgb_data[:, j, :]
-                pet_slice = pet_rgb_data[:, j, :]
+                ct_slice = ct_rgb_data[:, :, j]
+                pet_slice = pet_rgb_data[:, :, j]
                 print(f'ct slice = {ct_slice.shape}')
 
                 ratio_overlay1 = 0.8
@@ -129,7 +130,7 @@ def nifti_convert(fPath):
 
                 data = data.astype(np.uint8)
                 img = Image.fromarray(data, 'RGB')
-                filename = str(patient_num) + '_frontal_slice' + num + '.jpg'
+                filename = str(patient_num) + '_median_slice' + num + '.jpg'
                 img.save(filename)
                 print(filename, ' saved')
 
@@ -148,7 +149,7 @@ def get_labels(fPath):
         img_roi_data = sitk.GetArrayFromImage(img_roi)
         nzero = img_roi_data.nonzero()
         new_nzero_slice = []
-        for i in nzero[1]:
+        for i in nzero[2]:
             if i not in new_nzero_slice:
                 new_nzero_slice.append(i)
         # print('new nonzero = ', new_nzero_slice)
@@ -156,19 +157,19 @@ def get_labels(fPath):
         start_idx = min(new_nzero_slice)
         end_idx = max(new_nzero_slice)
         print(f'start idx = {start_idx}, end idx = {end_idx}')
-        for i in range(np.shape(img_roi_data)[1]):
+        for i in range(np.shape(img_roi_data)[2]):
             # if start_idx > i or end_idx < i:
             #     os.chdir(fPath)
             #     num = '{0:0>3}'.format(i)
             #     with open(patient_num + "_slice" + str(num) + ".txt", "w") as f:
             #         pass
             if start_idx <= i <= end_idx:
-                roi_slice = img_roi_data[:, i, :]
+                roi_slice = img_roi_data[:, :, i]
                 nzero = roi_slice.nonzero()
                 print(f'roi_slice = {roi_slice}')
-                print('nzero = ', nzero[1])
+                # print('nzero = ', nzero[2])
                 # print(f'nzero shape = {nzero.shape}')
-                new_nzero_w = [] # 160, x
+                new_nzero_w = [] # 128, y
                 new_nzero_h = [] # 80, z
                 for j in nzero[1]:
                     if j not in new_nzero_w:
@@ -176,17 +177,17 @@ def get_labels(fPath):
                 for k in nzero[0]:
                     if k not in new_nzero_h:
                         new_nzero_h.append(k)
-                # normalize with image width and height (160x80)
-                centerX = ((min(new_nzero_w) + max(new_nzero_w)) / 2)/np.shape(img_roi_data)[2]
+                # normalize with image width and height (128x80)
+                centerX = ((min(new_nzero_w) + max(new_nzero_w)) / 2)/np.shape(img_roi_data)[1]
                 centerY = 1 - (((min(new_nzero_h) + max(new_nzero_h)) / 2)/np.shape(img_roi_data)[0])
                 # centerY = 1 - centerY
-                w = (max(new_nzero_w) - min(new_nzero_w))/np.shape(img_roi_data)[2]
+                w = (max(new_nzero_w) - min(new_nzero_w))/np.shape(img_roi_data)[1]
                 h = (max(new_nzero_h) - min(new_nzero_h))/np.shape(img_roi_data)[0]
                 os.chdir(fPath)
                 num = '{0:0>3}'.format(i)
                 # print('num = ', num)
 
-                with open(patient_num + "_frontal_slice" + str(num) + ".txt", "w") as f:
+                with open(patient_num + "_median_slice" + str(num) + ".txt", "w") as f:
                     f.write("0 " + str(centerX) + " ")
                     f.write(str(centerY) + " ")
                     f.write(str(w) + " ")
@@ -215,7 +216,7 @@ def get_labels(fPath):
             nzero = img_lymph_data.nonzero()
             # print(f'nzero = {nzero}, type of nzero = {type(nzero)}')
             new_nzero_slice = []
-            for i in nzero[1]:
+            for i in nzero[2]:
                 if i not in new_nzero_slice:
                     new_nzero_slice.append(i)
             # print(f'new nzero = {new_nzero_slice}, type of nzero = {type(new_nzero_slice)}')
@@ -229,14 +230,14 @@ def get_labels(fPath):
             end_idx = max(new_nzero_slice)
             print(f'start idx = {start_idx}, end idx = {end_idx}')
 
-            for i in range(np.shape(img_lymph_data)[1]):
+            for i in range(np.shape(img_lymph_data)[2]):
                 # if start_idx > i or end_idx < i:
                 #     os.chdir(fPath)
                 #     num = '{0:0>3}'.format(i)
                 #     with open(patient_num + "_slice" + str(num) + ".txt", "a") as f:
                 #         pass
                 if start_idx <= i <= end_idx:
-                    roi_slice = img_lymph_data[:, i, :]
+                    roi_slice = img_lymph_data[:, :, i]
                     # print('i1 = ', i)
                     nzero = roi_slice.nonzero()
                     # print('nzero = ', nzero)
@@ -252,11 +253,11 @@ def get_labels(fPath):
 
                     print(f'min(new_nzero_w) = {min(new_nzero_w)}, max(new_nzero_w) = {max(new_nzero_w)}')
                     print(f'min(new_nzero_h) = {min(new_nzero_h)}, max(new_nzero_h) = {max(new_nzero_h)}')
-                    print(f'np.shape(img_roi_data)[2] = {np.shape(img_roi_data)[2]}, np.shape(img_roi_data)[0] = {np.shape(img_roi_data)[0]}')
-                    centerX = ((min(new_nzero_w) + max(new_nzero_w)) / 2)/np.shape(img_roi_data)[2]
+                    print(f'np.shape(img_roi_data)[1] = {np.shape(img_roi_data)[1]}, np.shape(img_roi_data)[0] = {np.shape(img_roi_data)[0]}')
+                    centerX = ((min(new_nzero_w) + max(new_nzero_w)) / 2)/np.shape(img_roi_data)[1]
                     centerY = 1 - (((min(new_nzero_h) + max(new_nzero_h)) / 2)/np.shape(img_roi_data)[0])
                     # centerY = 1 - centerY
-                    w = (max(new_nzero_w) - min(new_nzero_w))/np.shape(img_roi_data)[2]
+                    w = (max(new_nzero_w) - min(new_nzero_w))/np.shape(img_roi_data)[1]
                     h = (max(new_nzero_h) - min(new_nzero_h))/np.shape(img_roi_data)[0]
 
                     os.chdir(fPath)
@@ -264,7 +265,7 @@ def get_labels(fPath):
 
                     # "a" is append mode
                     # 기존의 파일의 마지막에 추가
-                    file_name = patient_num + "_frontal_slice" + str(num) + ".txt"
+                    file_name = patient_num + "_median_slice" + str(num) + ".txt"
                     if os.path.isfile(fPath + '/' + file_name):
                         txt_mode = 'a'
                     else:
