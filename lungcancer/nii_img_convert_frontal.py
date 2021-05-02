@@ -43,7 +43,7 @@ def nifti_convert(fPath):
     pet_rgb_data = pet_rgb_data[::-1, ::-1, :]
     lymph_list = glob.glob(fPath + '*_lymph_cut.nii.gz')
 
-    patient_num = fPath.split('/')[-2]
+    patient_num = fPath.split('\\')[-2]
     print(f'patient_num = {patient_num}')
 
     print('ct max = ', img_ct_data.max(), ' , pet max = ', img_pet_data.max())
@@ -141,7 +141,7 @@ def get_labels(fPath):
     roi_list = glob.glob(fPath + 'ROI_cut.nii.gz')
     lymph_list = glob.glob(fPath + '*_lymph_cut.nii.gz')
 
-    patient_num = fPath.split('/')[-2]
+    patient_num = fPath.split('\\')[-2]
     print(f'patient_num = {patient_num}')
 
     if len(roi_list) >= 1:
@@ -281,8 +281,8 @@ def get_labels(fPath):
 
 
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
-foldList = glob.glob('E:/HSE/LungCancerDetect/one/45730513/')
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/one/45730513/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
 # foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/valid/45706084/')
@@ -293,3 +293,4 @@ for i in foldList:
     get_labels(i)
     count += 1
     print('count = ', count)
+

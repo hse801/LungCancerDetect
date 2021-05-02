@@ -283,8 +283,8 @@ def get_labels(fPath):
 
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/45730513/')
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
-foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
 # foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/valid/45706084/')
 count = 0
