@@ -290,7 +290,7 @@ foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 count = 0
 
 for i in foldList:
-    nifti_convert(i)
+    # nifti_convert(i)
     get_labels(i)
     count += 1
     print('count = ', count)

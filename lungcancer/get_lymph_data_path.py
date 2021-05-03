@@ -19,12 +19,12 @@ print('len = ', len(file_list))
 # print('file list = ', file_list)
 
 os.chdir('E:/HSE/LungCancerDetect/data/images/')
-f = open('test_transverse_labels.txt', 'w')
+f = open('test_median_labels.txt', 'w')
 for i in file_list:
     print(f'i = {i}')
     patient_num = i.split('\\')[-2]
     print(f'patient_num = {patient_num}')
-    img_name = glob.glob(i + patient_num + '_slice*.txt')
+    img_name = glob.glob(i + patient_num + '_median_slice*.txt')
     print(f'image name = {img_name}')
     print(f'num of img = {len(img_name)}')
     for ele in img_name:
