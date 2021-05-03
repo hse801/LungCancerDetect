@@ -7,6 +7,7 @@ import numpy as np
 import SimpleITK as sitk
 
 from lungmask import mask
+import shutil
 
 # crop and copy 2nd roi data
 # patientnum_date 이렇게 된 환자 데이터도 함께 처리해야함
@@ -159,6 +160,22 @@ def CropImage(fPath, patient_num, full_name):
     print('check 4')
 
 
+def CopyLymph(patient_name, only_num):
+    # only_num은 환자 번호만
+    # patient_name은 _2nd나 날짜도 포함
+    roi_cut_fold = 'E:/HSE/lymphdata/'+ patient_name + '/RoiVolume_cut/'
+    file_path = 'E:/HSE/LungCancerDetect/data/images/train/'
+
+    # os.chdir(file_path + only_num)
+    # shutil.copytree(roi_cut_fold, 'RoiVolume_cut')
+    # print(f'filed copied from {roi_cut_fold} to {os.getcwd()}' )
+    #
+    # lymph_roi_path = file_path + only_num + '/RoiVolume_cut/'
+    roi_list = os.listdir(roi_cut_fold)
+    for f in roi_list:
+        shutil.copy2(roi_cut_fold + f, file_path + only_num)
+    print('file copied from ', roi_cut_fold, ' to ', file_path + only_num)
+
 # Create RoiVolume_cut Folder to save cropped lymph node data
 # fold_path = glob.glob('E:/HSE/lymphdata/*/')
 # count = 0
@@ -168,7 +185,7 @@ def CropImage(fPath, patient_num, full_name):
 
 
 # _2nd 이거나 환자이름_날짜 형식으로 되어 이전에 처리 안 된 데이터들만 모으기
-roiPath = glob.glob('E:/HSE/lymphdata/2*_*/RoiVolume/')
+roiPath = glob.glob('E:/HSE/lymphdata/*_*/RoiVolume/')
 additional_list = []
 fold_list = []
 if __name__ == '__main__':
@@ -177,7 +194,9 @@ if __name__ == '__main__':
         additional_list.append(patient_name)
         only_num = patient_name.split('_')[0]
         fold_name = 'F:/03. DataSet/Lung Cancer (PET-CT)/SNUH_lung/' + only_num + '/'
-        CropImage(fold_name, only_num, patient_name)
+        # CropImage(fold_name, only_num, patient_name)
+        CopyLymph(patient_name, only_num)
+
         # fold_list.append(fold_name)
         # break
         # print(f'only_num = {only_num}')
