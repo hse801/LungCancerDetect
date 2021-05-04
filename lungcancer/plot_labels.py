@@ -150,11 +150,11 @@ def read_targets(img_path, ground_truth):
     patient_name = img_path.split('\\')[-2]
     if ground_truth:
         # label path of ground truth
-        label_path = 'E:/HSE/LungCancerDetect/data/images/test/'+ patient_name+'/' + img_file_name.replace('jpg', 'txt')
+        label_path = 'E:/HSE/LungCancerDetect/data/images/train/'+ patient_name+'/' + img_file_name.replace('jpg', 'txt')
     else:
         # label path of prediction
         # test exp 43, valid exp 44, train exp45
-        label_path = 'E:/HSE/LungCancerDetect/data/images/test/' + patient_name + '/' + img_file_name.replace('jpg','txt')
+        label_path = 'E:/HSE/LungCancerDetect/data/images/train/' + patient_name + '/' + img_file_name.replace('jpg','txt')
     targets = []
     if os.path.isfile(label_path):
         labels = open(label_path, 'r')
