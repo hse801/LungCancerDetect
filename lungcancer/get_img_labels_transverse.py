@@ -112,7 +112,7 @@ def nifti_convert(fPath):
 
             data = data.astype(np.uint8)
             img = Image.fromarray(data, 'RGB')
-            filename = str(patient_num) + '_test_slice' + num + '.jpg'
+            filename = str(patient_num) + '_test2_slice' + num + '.jpg'
             img.save(filename)
             print(f'{filename} saved in {os.getcwd()}')
 
@@ -173,7 +173,7 @@ def nifti_convert(fPath):
 
                 data = data.astype(np.uint8)
                 img = Image.fromarray(data, 'RGB')
-                filename = str(patient_num) + '_test_slice' + num + '.jpg'
+                filename = str(patient_num) + '_test2_slice' + num + '.jpg'
                 img.save(filename)
                 print(f'{filename} saved in {os.getcwd()} for lymph node')
 
@@ -325,9 +325,9 @@ def get_labels(fPath):
 
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/45730513/')
-foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
 # foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/valid/45706084/')
 count = 0
 
@@ -336,7 +336,7 @@ for i in foldList:
     #     break
     nifti_convert(i)
     # get_labels(i)
-    # break
+    break
     count += 1
     print('count = ', count)
 

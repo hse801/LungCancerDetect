@@ -2,14 +2,19 @@ from typing import Dict, Tuple, List
 import re
 from zipfile import ZipFile
 from collections import defaultdict
+import numpy as np
 
 from bbutil import BB, BBCollections
+
+import SimpleITK as sitk
+
 
 def load_label_files(f: str) -> BBCollections:
     is_gt = True
     z = ZipFile(f)
     bb = {}
     filepattern = re.compile(r'(\d+)_slice(\d+).txt')
+    print(f'filepattern = {filepattern}')
     for filename in z.namelist():
         m = filepattern.match(filename)
         patient, slice = m.group(1), m.group(2)
@@ -26,7 +31,9 @@ def load_label_files(f: str) -> BBCollections:
                     is_gt = False
             if not is_gt:
                 klass, cx, cy, w, h, conf = [float(x) for x in line.split()]
-            roi[slice].append(BB(cx, cy, w, h, klass, conf))
+            roi[slice].append(BB(patient, slice, cx, cy, w, h, klass, conf))
+            # print(f'roi[slice] = {roi[slice]}')
+
     return bb
 
 confidence_min = 0.2
@@ -125,6 +132,72 @@ def compare_slice(gt_slice: List[BB], pred_slice: List[BB]):
     for gt in not_matched_gt:
         stat.add_fn(gt)
 
+
+def get_suv_mean(bbox_list: List[BB]):
+    suv_slice_mean = 0
+    bbox_area = 0
+
+    for b in bbox_list:
+        # img_path = f'E:/HSE/LungCancerDetect/data/images/test/{patient}/{patient}_slice{slice}.jpg'
+        pet_file = f'E:/HSE/LungCancerDetect/data/images/test/{b.patient}/PET_cut.nii.gz'
+        img_pet = sitk.ReadImage(pet_file)
+        img_pet_arr = sitk.GetArrayFromImage(img_pet)
+        img_pet_arr = img_pet_arr[:, ::-1, :]
+        x_dim, y_dim = 160, 128
+        w = b.w * x_dim
+        h = b.h * y_dim
+        x1 = b.x * x_dim - w * 0.5
+        x2 = b.x * x_dim + w * 0.5
+        y1 = b.y * y_dim - h * 0.5
+        y2 = b.y * y_dim + h * 0.5
+
+        bbox_pet = img_pet_arr[int(b.slice), round(y1):round(y2)+1, round(x1):round(x2)+1]
+        if bbox_pet.size == 0:
+            print(f'bbox_pet empty: x1 = {x1}, x2 = {x2}, y1 = {y1}, y2 = {y2}, w = {w}, h = {h}')
+            continue
+
+        suv_slice_mean += np.sum(bbox_pet)
+        bbox_area += w * h
+
+    suv_mean_area = suv_slice_mean / bbox_area
+        # suv_mean_sum += suv_slice_mean
+    print(f'suv_slice_mean = {suv_slice_mean}')
+    print(f'len(patient_list) = {len(bbox_list)}')
+    # suv_total_mean = suv_slice_mean / len(patient_list)
+    # return suv_slice_mean / len(bbox_list)
+
+    return suv_mean_area
+
+def get_suv_mean_dict(gt_bb: BBCollections):
+    suv_slice_mean = 0
+    bbox_count = 0
+    bbox_area = 0
+    for patient in gt_bb:
+        pet_file = f'E:/HSE/LungCancerDetect/data/images/test/{patient}/PET_cut.nii.gz'
+        img_pet = sitk.ReadImage(pet_file)
+        img_pet_arr = sitk.GetArrayFromImage(img_pet)
+        img_pet_arr = img_pet_arr[:, ::-1, :]
+        for slice in gt_bb[patient]:
+            for b in gt_bb[patient][slice]:
+                x_dim, y_dim = 160, 128
+                w = b.w * x_dim
+                h = b.h * y_dim
+                x1 = b.x * x_dim - w * 0.5
+                x2 = b.x * x_dim + w * 0.5
+                y1 = b.y * y_dim - h * 0.5
+                y2 = b.y * y_dim + h * 0.5
+
+                bbox_pet = img_pet_arr[int(b.slice), round(y1):round(y2) + 1, round(x1):round(x2) + 1]
+                if bbox_pet.size == 0:
+                    print(f'bbox_pet empty: x1 = {x1}, x2 = {x2}, y1 = {y1}, y2 = {y2}, w = {w}, h = {h}')
+                    continue
+                bbox_count += 1
+                suv_slice_mean += np.sum(bbox_pet)
+                bbox_area += w * h
+    # return suv_slice_mean / bbox_count
+    return suv_slice_mean / bbox_area
+
+
 def analysis(gt_file: str, pred_file: str):
     gt_bb = load_label_files(gt_file)
     num_gt_slice = sum(len(p) for p in gt_bb)
@@ -134,15 +207,30 @@ def analysis(gt_file: str, pred_file: str):
         for slice in gt_bb[patient]:
             compare_slice(gt_bb[patient][slice], pred_bb[patient][slice])
 
+    fp_suv_mean = get_suv_mean(stat.false_positive_list)
+    fn_suv_mean = get_suv_mean(stat.false_negative_list)
+    gt_suv_mean = get_suv_mean_dict(gt_bb)
+    pred_suv_mean = get_suv_mean_dict(pred_bb)
+    print(f'fp suv mean = {fp_suv_mean}')
+    print(f'fn_suv_mean = {fn_suv_mean}')
+    print(f'gt_suv_mean = {gt_suv_mean}')
+    print(f'pred_suv_mean = {pred_suv_mean}')
+
     print(f'gt num patient = {len(gt_bb)} total slice num = {num_gt_slice}')
     print(f'pred num patient = {len(pred_bb)} total slice num = {num_pred_slice}')
     print(f'fp mean area = {stat.fp_average_area()} num = {len(stat.false_positive_list)}')
     print(f'false_negative_list = {stat.false_negative_list}')
+    print(f'list type = {type(stat.false_negative_list)}')
+    # for fn in stat.false_negative_list:
+    #     print(f'fn type = {type(fn)}')
+
     print(f'fn mean area = {stat.fn_average_area()} num = {len(stat.false_negative_list)}')
     print(f'gt mean area = {stat.gt_average_area()} num = {stat.num_gt_bb}')
+
     print(f'pred mean area = {stat.pred_average_area()} num = {stat.num_pred_bb}')
     print(f'wrong klass pred = {stat.num_wrong_klass}')
     return gt_bb, pred_bb, stat
+
 
 if __name__ == '__main__':
     import argparse
@@ -160,6 +248,3 @@ if __name__ == '__main__':
     # if opt.gui:
     #     from bbplot import plot
     #     plot(bb_gt, bb_pred)
-    # 점선이 림프
-    # 실선이 primary
-    # 빨간게 ground truth, 초록이 prediction
