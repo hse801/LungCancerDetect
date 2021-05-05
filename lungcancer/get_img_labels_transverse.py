@@ -34,30 +34,30 @@ def nifti_convert(fPath):
     img_ct_data = (img_ct_data - nums[0]) / (nums[1] + 1e-8)
     img_ct_data[img_ct_data > 3] = 3
     ct_rgb_data = ((img_ct_data - img_ct_data.min()) / (img_ct_data.max() - img_ct_data.min()) * 255)
-    ct_rgb_data = ct_rgb_data[::-1, ::-1, :]
+    ct_rgb_data = ct_rgb_data[:, ::-1, :]
     img_pet = sitk.ReadImage(pet_file)
     img_pet_data = sitk.GetArrayFromImage(img_pet)
     img_pet_data = (img_pet_data - nums[2]) / (nums[3] + 1e-8)
     # img_pet_data[img_pet_data > 3] = 3
     pet_rgb_data = ((img_pet_data - img_pet_data.min()) / (img_pet_data.max() - img_pet_data.min()) * 255)
-    pet_rgb_data = pet_rgb_data[::-1, ::-1, :]
+    pet_rgb_data = pet_rgb_data[:, ::-1, :]
     lymph_list = glob.glob(fPath + '*_lymph_cut.nii.gz')
 
     patient_num = fPath.split('\\')[-2]
     print(f'patient_num = {patient_num}')
 
-    print('ct max = ', img_ct_data.max(), ' , pet max = ', img_pet_data.max())
-    print('ct min = ', img_ct_data.min(), ' , pet min = ', img_pet_data.min())
-    print('ct mean = ', img_ct_data.mean(), ' , pet mean = ', img_pet_data.mean())
-    print('ct rgb max = ', ct_rgb_data.max(), ' , pet rgb max = ', pet_rgb_data.max())
-    print('ct rgb min = ', ct_rgb_data.min(), ' , pet rgb max = ', pet_rgb_data.min())
-    print('ct rgb mean = ', ct_rgb_data.mean(), ' , pet rgb mean = ', pet_rgb_data.mean())
-    print('ct rgb shape = ', ct_rgb_data.shape, ' , pet rgb shape = ', pet_rgb_data.shape)
+    # print('ct max = ', img_ct_data.max(), ' , pet max = ', img_pet_data.max())
+    # print('ct min = ', img_ct_data.min(), ' , pet min = ', img_pet_data.min())
+    # print('ct mean = ', img_ct_data.mean(), ' , pet mean = ', img_pet_data.mean())
+    # print('ct rgb max = ', ct_rgb_data.max(), ' , pet rgb max = ', pet_rgb_data.max())
+    # print('ct rgb min = ', ct_rgb_data.min(), ' , pet rgb max = ', pet_rgb_data.min())
+    # print('ct rgb mean = ', ct_rgb_data.mean(), ' , pet rgb mean = ', pet_rgb_data.mean())
+    # print('ct rgb shape = ', ct_rgb_data.shape, ' , pet rgb shape = ', pet_rgb_data.shape)
 
     if len(roi_list) >= 1:
         img_roi = sitk.ReadImage(roi_list[0])
         img_roi_data = sitk.GetArrayFromImage(img_roi)
-        print(f'img_roi shape = {img_roi_data.shape}')
+        # print(f'img_roi shape = {img_roi_data.shape}')
 
         nzero = img_roi_data.nonzero()
         new_nzero = []
@@ -68,37 +68,57 @@ def nifti_convert(fPath):
 
         start_idx = min(new_nzero)
         end_idx = max(new_nzero)
-        print(f'nzero = {nzero}')
-        # print(f'nzero shape = {nzero.shape}')
-        print(f'new nzero = {new_nzero}')
+
+        # start_idx2 = new_nzero[0]
+        # end_idx2 = new_nzero[-1]
+        # print(f'nzero = {nzero}')
+        # # print(f'nzero shape = {nzero.shape}')
+        # print(f'new nzero = {new_nzero}')
         print(f'start idx = {start_idx}, end idx = {end_idx}')
+        # print(f'start idx2 = {start_idx2}, end idx2 = {end_idx2}')
         j = start_idx
 
-        print(f'fPath = {fPath}')
+        # print(f'fPath = {fPath}')
 
         for j in range(start_idx, end_idx + 1):
             num = '{0:0>3}'.format(j)
             os.chdir(fPath)
             ct_slice = ct_rgb_data[j, :, :]
             pet_slice = pet_rgb_data[j, :, :]
-            print(f'ct slice = {ct_slice.shape}')
+            # print(f'ct slice = {ct_slice.shape}')
             # zero_arr = np.zeros((128, 160))
             # data = np.stack((ct_slice, ct_slice, pet_slice), axis=-1)
             # data = np.stack((ct_slice, pet_slice, zero_arr), axis=-1)
             ratio_overlay1 = 0.8
             ratio_overlay2 = 0.6
+
+            pet_ct = pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2
+            pet_ct = ((pet_ct - pet_ct.min()) / (pet_ct.max() - pet_ct.min()) * 255)
+            print(f'max = {max(map(max, pet_ct))}, min = {max(map(min, pet_ct))}')
+            if max(map(max, pet_ct)) > 255:
+                print('max over 255')
+
             # data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255), ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
-            data = np.stack((ct_slice, pet_slice, np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255)), axis=-1)
+            # data = np.stack(((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255)), pet_slice, ct_slice), axis=-1)
+            # data = np.stack((pet_ct, ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+            # data = np.stack((ct_slice, pet_slice, pet_slice), axis=-1)
+            # data = np.stack((pet_ct, pet_slice, ct_slice), axis=-1)
+            # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
+            data = np.stack((pet_ct, ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+
+            # r1 = 0.9
+            # r2 = 0.2
+            # data = np.stack((pet_slice*r2, pet_slice*r2, ct_slice * r1 + pet_slice * r2), axis=-1)
 
             data = data.astype(np.uint8)
             img = Image.fromarray(data, 'RGB')
-            filename = str(patient_num) + '_conv_slice' + num + '.jpg'
+            filename = str(patient_num) + '_test_slice' + num + '.jpg'
             img.save(filename)
-            print(filename, ' saved')
+            print(f'{filename} saved in {os.getcwd()}')
 
     # if lymph roi file exist
     if lymph_list:
-        print(f'lymph list = {lymph_list}')
+        # print(f'lymph list = {lymph_list}')
         for l in lymph_list:
             img_lymph = sitk.ReadImage(l)
             img_lymph_data = sitk.GetArrayFromImage(img_lymph)
@@ -110,32 +130,52 @@ def nifti_convert(fPath):
                     new_nzero_slice.append(i)
             # print(f'new nzero = {new_nzero_slice}, type of nzero = {type(new_nzero_slice)}')
             # If ROI data is empty
-            if new_nzero_slice == []:
+            if not new_nzero_slice:
                 print('ROI is empty')
                 continue
             # print('new nonzero = ', new_nzero_slice)
 
             start_idx = min(new_nzero_slice)
             end_idx = max(new_nzero_slice)
+
+            # start_idx2 = new_nzero_slice[0]
+            # end_idx2 = new_nzero_slice[-1]
+
             print(f'start idx = {start_idx}, end idx = {end_idx}')
+            # print(f'start idx2 = {start_idx2}, end idx2 = {end_idx2}')
+
             for j in range(start_idx, end_idx + 1):
                 num = '{0:0>3}'.format(j)
                 os.chdir(fPath)
                 ct_slice = ct_rgb_data[j, :, :]
                 pet_slice = pet_rgb_data[j, :, :]
-                print(f'ct slice = {ct_slice.shape}')
+                # print(f'ct slice = {ct_slice.shape}')
 
                 ratio_overlay1 = 0.8
                 ratio_overlay2 = 0.6
-                data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
-                                 ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
-                # data = np.stack((ct_slice, ct_slice, np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255)),axis=-1)
+
+                pet_ct = pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2
+                pet_ct = ((pet_ct - pet_ct.min()) / (pet_ct.max() - pet_ct.min()) * 255)
+                print(f'max = {max(map(max, pet_ct))}, min = {max(map(min, pet_ct))}')
+                if max(map(max, pet_ct)) > 255:
+                    print('max over 255')
+
+                # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
+
+                # data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
+                #                  ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+                # data = np.stack((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255), ct_slice, pet_slice), axis=-1)
+                # data = np.stack(((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255)), pet_slice, ct_slice), axis=-1)
+                # data = np.stack((ct_slice, pet_slice, pet_slice), axis=-1)
+                # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
+                data = np.stack((pet_ct, ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+                # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
 
                 data = data.astype(np.uint8)
                 img = Image.fromarray(data, 'RGB')
-                filename = str(patient_num) + '_conv_slice' + num + '.jpg'
+                filename = str(patient_num) + '_test_slice' + num + '.jpg'
                 img.save(filename)
-                print(filename, ' saved')
+                print(f'{filename} saved in {os.getcwd()} for lymph node')
 
 
 def get_labels(fPath):
@@ -190,7 +230,7 @@ def get_labels(fPath):
                 num = '{0:0>3}'.format(i)
                 # print('num = ', num)
 
-                with open(patient_num + "_slice" + str(num) + ".txt", "w") as f:
+                with open(patient_num + "_test_slice" + str(num) + ".txt", "w") as f:
                     f.write("0 " + str(centerX) + " ")
                     f.write(str(centerY) + " ")
                     f.write(str(w) + " ")
@@ -269,7 +309,7 @@ def get_labels(fPath):
 
                     # "a" is append mode
                     # 기존의 파일의 마지막에 추가
-                    file_name = patient_num + "_slice" + str(num) + ".txt"
+                    file_name = patient_num + "_test_slice" + str(num) + ".txt"
                     if os.path.isfile(fPath + '/' + file_name):
                         txt_mode = 'a'
                     else:
@@ -292,9 +332,11 @@ foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 count = 0
 
 for i in foldList:
+    # if count > 6:
+    #     break
     nifti_convert(i)
     # get_labels(i)
-    break
+    # break
     count += 1
     print('count = ', count)
 

@@ -171,7 +171,7 @@ def test(data,
 
             # Assign all predictions as incorrect
             correct = torch.zeros(pred.shape[0], niou, dtype=torch.bool, device=device)
-            if nl:
+            if nl: # nl: len(labels)
                 detected = []  # target indices
                 tcls_tensor = labels[:, 0]
 
@@ -190,10 +190,15 @@ def test(data,
                     if pi.shape[0]:
                         # Prediction to target ious
                         ious, i = box_iou(predn[pi, :4], tbox[ti]).max(1)  # best ious, indices
+                        print(f'ious = {ious}')
+                        # ious type: torch.Tensor
 
                         # Append detections
                         detected_set = set()
                         for j in (ious > iouv[0]).nonzero(as_tuple=False):
+                            # print(f'iouv type = {type(iouv)}, iouv[0] = {iouv[0]}')
+                            # iouv type: torch.Tensor, iouv[0] = 0.5
+                            print(f'j type = {type(j)}, j = {j}')
                             d = ti[i[j]]  # detected target
                             if d.item() not in detected_set:
                                 detected_set.add(d.item())

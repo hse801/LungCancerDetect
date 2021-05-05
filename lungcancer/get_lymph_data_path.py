@@ -19,12 +19,12 @@ print('len = ', len(file_list))
 # print('file list = ', file_list)
 
 os.chdir('E:/HSE/LungCancerDetect/data/images/')
-f = open('train_ours.txt', 'w')
+f = open('train_testdata.txt', 'w')
 for i in file_list:
     print(f'i = {i}')
     patient_num = i.split('\\')[-2]
     print(f'patient_num = {patient_num}')
-    img_name = glob.glob(i + patient_num + '_slice*.jpg')
+    img_name = glob.glob(i + patient_num + '_test_slice*.jpg')
     # print(f'image name = {img_name}')
     # print(f'num of img = {len(img_name)}')
     for ele in img_name:

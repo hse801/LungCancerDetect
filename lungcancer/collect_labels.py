@@ -5,11 +5,13 @@ import shutil
 os.chdir('E:/HSE/LungCancerDetect/data/images/')
 dst = 'E:/HSE/LungCancerDetect/data/labels/transverse/train/'
 
-with open('train_median_labels.txt', 'r') as f:
+with open('train_ours.txt', 'r') as f:
     lines = f.readlines()
     lines = list(map(lambda s: s.strip(), lines))
 
 for l in lines:
-    os.remove(l)
-    print(l)
-    # shutil.copy2(l, dst)
+    # os.remove(l)
+    # print(l)
+    l = l.replace('jpg', 'txt')
+    shutil.copy2(l, dst)
+    print(f'copy {l} to {dst}')
