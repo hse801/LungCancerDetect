@@ -1,10 +1,11 @@
 from typing import Dict, Tuple, List
 import re
 from zipfile import ZipFile
-from collections import defaultdict, namedtuple
-BB = namedtuple("BoundingBox", "x y w h klass confidence")
+from collections import defaultdict
 
-def load_label_files(f: str) -> Dict[str, Dict[str, List[BB]]]:
+from bbutil import BB, BBCollections
+
+def load_label_files(f: str) -> BBCollections:
     is_gt = True
     z = ZipFile(f)
     bb = {}
@@ -45,7 +46,7 @@ def iou(a: BB, b: BB) -> float:
 
 class Stat:
     def __init__(self):
-        self.false_positve_list: List[BB] = []
+        self.false_positive_list: List[BB] = []
         self.false_negative_list: List[BB] = []
         self.num_gt_bb = 0
         self.num_pred_bb = 0
@@ -63,7 +64,7 @@ class Stat:
                 self.num_pred_bb += 1
 
     def add_fp(self, bb: BB):
-        self.false_positve_list.append(bb)
+        self.false_positive_list.append(bb)
 
     def add_fn(self, bb: BB):
         self.false_negative_list.append(bb)
@@ -72,12 +73,12 @@ class Stat:
         self.num_wrong_klass += 1
 
     def fp_average_area(self) -> float:
-        if not self.false_positve_list:
+        if not self.false_positive_list:
             return 0.0
         area = 0
-        for bb in self.false_positve_list:
+        for bb in self.false_positive_list:
             area += bb.w * bb.h
-        return area / len(self.false_positve_list)
+        return area / len(self.false_positive_list)
 
     def fn_average_area(self) -> float:
         if not self.false_negative_list:
@@ -135,11 +136,13 @@ def analysis(gt_file: str, pred_file: str):
 
     print(f'gt num patient = {len(gt_bb)} total slice num = {num_gt_slice}')
     print(f'pred num patient = {len(pred_bb)} total slice num = {num_pred_slice}')
-    print(f'fp mean area = {stat.fp_average_area()} num = {len(stat.false_positve_list)}')
+    print(f'fp mean area = {stat.fp_average_area()} num = {len(stat.false_positive_list)}')
+    print(f'false_negative_list = {stat.false_negative_list}')
     print(f'fn mean area = {stat.fn_average_area()} num = {len(stat.false_negative_list)}')
     print(f'gt mean area = {stat.gt_average_area()} num = {stat.num_gt_bb}')
     print(f'pred mean area = {stat.pred_average_area()} num = {stat.num_pred_bb}')
     print(f'wrong klass pred = {stat.num_wrong_klass}')
+    return gt_bb, pred_bb, stat
 
 if __name__ == '__main__':
     import argparse
@@ -148,8 +151,15 @@ if __name__ == '__main__':
     parser.add_argument('--iou', type=float, default=0.2, help='minimum iou for matching')
     parser.add_argument('--gt', type=str, default='test_gt.zip', help='gt label zip file')
     parser.add_argument('--pred', type=str, default='test_pred.zip', help='prediction label zip file')
+    parser.add_argument('--gui', type=bool, default=True, help='show viewer for bounding box')
     opt = parser.parse_args()
 
     confidence_min = opt.confidence
     iou_min = opt.iou
-    analysis(opt.gt, opt.pred)
+    bb_gt, bb_pred, stat = analysis(opt.gt, opt.pred)
+    # if opt.gui:
+    #     from bbplot import plot
+    #     plot(bb_gt, bb_pred)
+    # 점선이 림프
+    # 실선이 primary
+    # 빨간게 ground truth, 초록이 prediction
