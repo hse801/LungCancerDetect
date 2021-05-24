@@ -8,8 +8,8 @@ import pickle
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/CT_PET_*.npy')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/testset/*/CT_PET_*.jpg')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
-file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
-# file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
+# file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+file_list = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/data/imags/valid/*/CT_PET_*.jpg')
 # file_list = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
 
@@ -19,7 +19,7 @@ print('len = ', len(file_list))
 # print('file list = ', file_list)
 
 os.chdir('E:/HSE/LungCancerDetect/data/images/')
-f = open('train_testdata.txt', 'w')
+f = open('train_conv_new.txt', 'w')
 for i in file_list:
     print(f'i = {i}')
     patient_num = i.split('\\')[-2]

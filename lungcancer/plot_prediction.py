@@ -137,7 +137,7 @@ def plot_images(infiles, fname, paths=None, names=None, max_size=640, max_subplo
         mosaic = cv2.resize(mosaic, (int(ns * w * r), int(ns * h * r)), interpolation=cv2.INTER_AREA)
         # cv2.imwrite(fname, cv2.cvtColor(mosaic, cv2.COLOR_BGR2RGB))  # cv2 save
         print('PIL save to', fname, 'image shape', mosaic.shape)
-        os.chdir('E:/HSE/without_conf/test/') # 생성한 이미지 파일 저장되는 경로
+        os.chdir('E:/HSE/without_conf/test_ours/') # 생성한 이미지 파일 저장되는 경로
         Image.fromarray(mosaic).save(fname)  # PIL save
         # cv2.imshow(fname, mosaic)
         # cv2.waitKey(0)
@@ -153,12 +153,15 @@ def read_targets(img_path, ground_truth):
     else:
         # label path of prediction
         # test exp 43, valid exp 44, train exp45
-        label_path = 'E:/HSE/LungCancerDetect/runs/test/exp44/labels/' + img_file_name.replace('jpg', 'txt')
+        label_path = 'E:/HSE/LungCancerDetect/runs/test/exp64/labels/' + img_file_name.replace('jpg', 'txt').replace('_slice','_conv_slice')
+        print(f'label_path = {label_path}')
     targets = []
     if os.path.isfile(label_path):
         labels = open(label_path, 'r')
         label_list = labels.readlines()
+        print(f'label_list = {label_list}')
         for l in label_list:
+            print(f'l = {l}')
             target = map(float, l.rstrip().split(' '))
             targets.append(list(target))
             # print(f'targets = {targets}')
@@ -188,14 +191,20 @@ def split_by_patient(lines):
 
 # 환자 목록 가져오기
 os.chdir('E:/HSE/LungCancerDetect/data/images/')
-lines = split_by_patient(open('patient_num_test_img.txt', 'r').readlines())
+lines = split_by_patient(open('test_conv_new.txt', 'r').readlines())
 names = {0: 'primary', 1: 'lymph'}
 
 for patient in lines:
     lines_per_patient = lines[patient]
+    print(f'lines_per_patient = {lines_per_patient}')
+    for i in range(len(lines_per_patient)):
+        lines_per_patient[i] = lines_per_patient[i].replace('_conv', '')
     for i in range(0, len(lines_per_patient), 8):
+        print(f'i = {i}')
         # patient_num = lines_per_patient[i:i+9].split('\\')[-1]
+        print(f'lines_per_patient[0] = {lines_per_patient[0]}')
         file_name = lines_per_patient[0].split('\\')[-2] + '_' + str(i) + '.jpg'
+        print(f'file name = {file_name}')
         plot_images(lines_per_patient[i:i+8], names=names, paths=lines_per_patient[i:i+8], fname=file_name)
         # plot_images()
         # print(f'lymph_only_patient num = {patient_num}')

@@ -14,6 +14,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import os
+import scipy
+from scipy.signal.signaltools import wiener
 
 
 def nifti_convert(fPath):
@@ -29,11 +31,13 @@ def nifti_convert(fPath):
     f.close()
     img_ct = sitk.ReadImage(ct_file)
     img_ct_data = sitk.GetArrayFromImage(img_ct)
+    # img_ct_data = scipy.signal.wiener(img_ct_data)
     img_ct_data[img_ct_data > 500] = 500
     # standardization
     img_ct_data = (img_ct_data - nums[0]) / (nums[1] + 1e-8)
     img_ct_data[img_ct_data > 3] = 3
     ct_rgb_data = ((img_ct_data - img_ct_data.min()) / (img_ct_data.max() - img_ct_data.min()) * 255)
+
     ct_rgb_data = ct_rgb_data[:, ::-1, :]
     img_pet = sitk.ReadImage(pet_file)
     img_pet_data = sitk.GetArrayFromImage(img_pet)
@@ -99,12 +103,12 @@ def nifti_convert(fPath):
                 print('max over 255')
 
             # data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255), ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
-            # data = np.stack(((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255)), pet_slice, ct_slice), axis=-1)
+            data = np.stack(((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255)), pet_slice, ct_slice), axis=-1)
             # data = np.stack((pet_ct, ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
             # data = np.stack((ct_slice, pet_slice, pet_slice), axis=-1)
             # data = np.stack((pet_ct, pet_slice, ct_slice), axis=-1)
             # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
-            data = np.stack((pet_ct, ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+            # data = np.stack((pet_ct, ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
 
             # r1 = 0.9
             # r2 = 0.2
@@ -112,7 +116,7 @@ def nifti_convert(fPath):
 
             data = data.astype(np.uint8)
             img = Image.fromarray(data, 'RGB')
-            filename = str(patient_num) + '_test2_slice' + num + '.jpg'
+            filename = str(patient_num) + '_test_slice' + num + '.jpg'
             img.save(filename)
             print(f'{filename} saved in {os.getcwd()}')
 
@@ -162,13 +166,13 @@ def nifti_convert(fPath):
 
                 # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
 
-                # data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
-                #                  ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+                data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
+                                 ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
                 # data = np.stack((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255), ct_slice, pet_slice), axis=-1)
                 # data = np.stack(((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255)), pet_slice, ct_slice), axis=-1)
                 # data = np.stack((ct_slice, pet_slice, pet_slice), axis=-1)
                 # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
-                data = np.stack((pet_ct, ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+                # data = np.stack((pet_ct, ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
                 # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
 
                 data = data.astype(np.uint8)

@@ -146,10 +146,10 @@ def get_suv_mean(bbox_list: List[BB]):
         x_dim, y_dim = 160, 128
         w = b.w * x_dim
         h = b.h * y_dim
-        x1 = b.x * x_dim - w * 0.5
-        x2 = b.x * x_dim + w * 0.5
-        y1 = b.y * y_dim - h * 0.5
-        y2 = b.y * y_dim + h * 0.5
+        x1 = (b.x - b.w * 0.5) * x_dim
+        x2 = (b.x + b.w * 0.5) * x_dim
+        y1 = (b.y - b.h * 0.5) * y_dim
+        y2 = (b.y + b.h * 0.5) * y_dim
 
         bbox_pet = img_pet_arr[int(b.slice), round(y1):round(y2)+1, round(x1):round(x2)+1]
         if bbox_pet.size == 0:
@@ -168,6 +168,7 @@ def get_suv_mean(bbox_list: List[BB]):
 
     return suv_mean_area
 
+
 def get_suv_mean_dict(gt_bb: BBCollections):
     suv_slice_mean = 0
     bbox_count = 0
@@ -182,10 +183,10 @@ def get_suv_mean_dict(gt_bb: BBCollections):
                 x_dim, y_dim = 160, 128
                 w = b.w * x_dim
                 h = b.h * y_dim
-                x1 = b.x * x_dim - w * 0.5
-                x2 = b.x * x_dim + w * 0.5
-                y1 = b.y * y_dim - h * 0.5
-                y2 = b.y * y_dim + h * 0.5
+                x1 = (b.x - b.w * 0.5) * x_dim
+                x2 = (b.x + b.w * 0.5) * x_dim
+                y1 = (b.y - b.h * 0.5) * y_dim
+                y2 = (b.y + b.h * 0.5) * y_dim
 
                 bbox_pet = img_pet_arr[int(b.slice), round(y1):round(y2) + 1, round(x1):round(x2) + 1]
                 if bbox_pet.size == 0:
