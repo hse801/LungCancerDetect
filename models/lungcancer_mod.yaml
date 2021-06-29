@@ -12,50 +12,60 @@ width_multiple: 1.0  # layer channel multiple
 #  - [10,13, 16,30, 33,23]  # P3/8
 #  - [30,61, 62,45, 59,119]  # P4/16
 #  - [116,90, 156,198, 373,326]  # P5/32
+
 anchors:
-  - [5,7, 12,15, 23,18]  # P3/8
-  - [20,26, 22,34, 16,24]  # P4/16
-  - [76,80, 66,68, 73,96]  # P5/32
-  - [90,116, 176,182, 129,155]
+#  - [5,7, 12,15, 23,18]  # P3/8
+#  - [20,26, 22,34, 16,24]  # P4/16
+#  - [76,80, 66,68, 73,96]  # P5/32
+#  - [5,7, 12,15, 23,18]
+  - [10,13, 16,30, 33,23]  # P3/8
+  - [30,61, 62,45, 59,119]  # P4/16
+  - [116,90, 156,198, 373,326]  # P5/32
 
 # darknet53 backbone
 backbone:
   # [from, number, module, args]
   [[-1, 1, Conv, [32, 3, 1]],  # 0
    [-1, 1, Conv, [64, 3, 2]],  # 1-P1/2
-   [-1, 1, Bottleneck, [64]],
+   [-1, 1, BottleneckCSP, [64]],
    [-1, 1, Conv, [128, 3, 2]],  # 3-P2/4
-   [-1, 2, Bottleneck, [128]],
+   [-1, 2, BottleneckCSP, [128]],
    [-1, 1, Conv, [256, 3, 2]],  # 5-P3/8
-   [-1, 8, Bottleneck, [256]],
+   [-1, 8, BottleneckCSP, [256]],
    [-1, 1, Conv, [512, 3, 2]],  # 7-P4/16
-   [-1, 8, Bottleneck, [512]],
+   [-1, 8, BottleneckCSP, [512]],
    [-1, 1, Conv, [1024, 3, 2]],  # 9-P5/32
-   [-1, 4, Bottleneck, [1024]],  # 10
+#   [-1, 4, Bottleneck, [1024]],  # 10
+   [-1, 4, C3TR, [1024, False]],
   ]
 
 # YOLOv3 head
 head:
-  [[-1, 1, Bottleneck, [1024, False]],
+  [[-1, 1, BottleneckCSP, [1024, False]],
+   [[-1, 8], 1, Concat, [1]],  # 12 cat backbone (add )
+   [-1, 1, BottleneckCSP, [512, False]],
    [-1, 1, Conv, [512, [1, 1]]],
-   [-1, 1, Conv, [1024, 3, 1]],
+   [-1, 1, Conv, [1024, 3, 1]], # 14
    [-1, 1, Conv, [512, 1, 1]],
-   [-1, 1, Conv, [1024, 3, 1]],  # 15 (P5/32-large)
+   [-1, 1, Conv, [1024, 3, 1]],  # 16 (P5/32-large)
+   [[-1, 6], 1, Concat, [1]],  # cat backbone P3 ( add)
 
    [-2, 1, Conv, [256, 1, 1]],
+   [-1, 1, BottleneckCSP, [256, False]],
 
    [-1, 1, nn.Upsample, [None, 2, 'nearest']],
-   [[-1, 8], 1, Concat, [1]],  # cat backbone P4
-   [-1, 1, Bottleneck, [512, False]],
-   [-1, 1, Bottleneck, [512, False]],
+   [[-1, 14], 1, Concat, [1]],  # cat head (mod)
+   [-1, 1, BottleneckCSP, [512, False]],
+   [-1, 1, BottleneckCSP, [512, False]],
    [-1, 1, Conv, [256, 1, 1]],
-   [-1, 1, Conv, [512, 3, 1]],  # 22 (P4/16-medium)
+   [-1, 1, Conv, [512, 3, 1]],  # 24 (P4/16-medium)
 
    [-2, 1, Conv, [128, 1, 1]],
    [-1, 1, nn.Upsample, [None, 2, 'nearest']],
-   [[-1, 6], 1, Concat, [1]],  # cat backbone P3
-   [-1, 1, Bottleneck, [256, False]],
-   [-1, 2, Bottleneck, [256, False]],  # 27 (P3/8-small)
+   [[-1, 24], 1, Concat, [1]],  # cat head
+   [-1, 1, BottleneckCSP, [256, False]],
+   [-1, 2, BottleneckCSP, [256, False]],  # 29 (P3/8-small)
 
-   [[27, 22, 15], 1, Detect, [nc, anchors]],   # Detect(P3, P4, P5)
+   # Add detection layer
+   [[29, 24, 16], 1, Detect, [nc, anchors]],   # Detect(P3, P4, P5)
   ]

@@ -116,7 +116,7 @@ def nifti_convert(fPath):
 
             data = data.astype(np.uint8)
             img = Image.fromarray(data, 'RGB')
-            filename = str(patient_num) + '_test_slice' + num + '.jpg'
+            filename = str(patient_num) + '_conv_slice' + num + '.jpg'
             img.save(filename)
             print(f'{filename} saved in {os.getcwd()}')
 
@@ -166,10 +166,10 @@ def nifti_convert(fPath):
 
                 # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
 
-                data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
-                                 ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
+                # data = np.stack((np.clip(pet_slice * ratio_overlay1 + ct_slice * ratio_overlay2, 0, 255),
+                #                  ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
                 # data = np.stack((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255), ct_slice, pet_slice), axis=-1)
-                # data = np.stack(((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255)), pet_slice, ct_slice), axis=-1)
+                data = np.stack(((np.clip(ct_slice * 0.5 + pet_slice * 0.5, 0, 255)), pet_slice, ct_slice), axis=-1)
                 # data = np.stack((ct_slice, pet_slice, pet_slice), axis=-1)
                 # data = np.stack((pet_ct, ct_slice, ct_slice), axis=-1)
                 # data = np.stack((pet_ct, ct_slice * ratio_overlay2, ct_slice * ratio_overlay2), axis=-1)
@@ -177,7 +177,7 @@ def nifti_convert(fPath):
 
                 data = data.astype(np.uint8)
                 img = Image.fromarray(data, 'RGB')
-                filename = str(patient_num) + '_test2_slice' + num + '.jpg'
+                filename = str(patient_num) + '_conv_slice' + num + '.jpg'
                 img.save(filename)
                 print(f'{filename} saved in {os.getcwd()} for lymph node')
 
@@ -232,9 +232,13 @@ def get_labels(fPath):
                 h = (max(new_nzero_h) - min(new_nzero_h))/np.shape(img_roi_data)[1]
                 os.chdir(fPath)
                 num = '{0:0>3}'.format(i)
-                # print('num = ', num)
+                # # print('num = ', num)
+                cancer_size = w * h * 120932.352
 
-                with open(patient_num + "_test_slice" + str(num) + ".txt", "w") as f:
+                if cancer_size < 0.1:
+                    continue
+
+                with open(patient_num + "_conv_slice" + str(num) + ".txt", "w") as f:
                     f.write("0 " + str(centerX) + " ")
                     f.write(str(centerY) + " ")
                     f.write(str(w) + " ")
@@ -307,13 +311,17 @@ def get_labels(fPath):
                     # centerY = 1 - centerY
                     w = (max(new_nzero_w) - min(new_nzero_w))/np.shape(img_lymph_data)[2]
                     h = (max(new_nzero_h) - min(new_nzero_h))/np.shape(img_lymph_data)[1]
+                    cancer_size = w * h * 120932.352
+
+                    if cancer_size < 0.1:
+                        continue
 
                     os.chdir(fPath)
                     num = '{0:0>3}'.format(i)
 
                     # "a" is append mode
                     # 기존의 파일의 마지막에 추가
-                    file_name = patient_num + "_test_slice" + str(num) + ".txt"
+                    file_name = patient_num + "_conv_slice" + str(num) + ".txt"
                     if os.path.isfile(fPath + '/' + file_name):
                         txt_mode = 'a'
                     else:
@@ -329,18 +337,18 @@ def get_labels(fPath):
 
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/23835418/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/one/45730513/')
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
-foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
 # foldList = glob.glob('E:/HSE/LungCancer/yolov3/data/images/valid/45706084/')
 count = 0
 
 for i in foldList:
     # if count > 6:
     #     break
-    nifti_convert(i)
-    # get_labels(i)
-    break
+    # nifti_convert(i)
+    get_labels(i)
+    # break
     count += 1
     print('count = ', count)
 

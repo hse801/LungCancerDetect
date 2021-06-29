@@ -33,13 +33,13 @@ def cancer_size(fold_list):
 
 def plot_size(size_list):
     # hist = plt.hist()
-    plt.hist(size_list, range=[0, 0.1])
+    plt.hist(size_list)
     # sns.distplot(size_list)
     plt.show()
 
-foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
 count = 0
 
 for i in foldList:
