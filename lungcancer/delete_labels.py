@@ -3,9 +3,9 @@ import glob
 
 # delete transverse labels
 
-# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
+foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/train/*/')
 # foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/valid/*/')
-foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
+# foldList = glob.glob('E:/HSE/LungCancerDetect/data/images/test/*/')
 count = 0
 
 for fold in foldList:
@@ -15,8 +15,8 @@ for fold in foldList:
     # files = glob.glob(str(fold) + '*-cut-*')
 
     for f in files:
-        print(f'file = {f}')
+        print(f'{f} is deleted')
         os.remove(f)
-    # break
     count += 1
     print('count = ', count)
+    # break

@@ -213,8 +213,8 @@ def get_labels(fPath):
             if start_idx <= i <= end_idx:
                 roi_slice = img_roi_data[i, :, :]
                 nzero = roi_slice.nonzero()
-                print(f'roi_slice = {roi_slice}')
-                print('nzero = ', nzero[1])
+                # print(f'roi_slice = {roi_slice}')
+                # print('nzero = ', nzero[1])
                 # print(f'nzero shape = {nzero.shape}')
                 new_nzero_w = [] # 160, x
                 new_nzero_h = [] # 128, y
@@ -346,9 +346,9 @@ count = 0
 for i in foldList:
     # if count > 6:
     #     break
-    # nifti_convert(i)
-    get_labels(i)
-    # break
+    nifti_convert(i)
+    # get_labels(i)
     count += 1
     print('count = ', count)
+    # break
 

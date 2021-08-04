@@ -156,13 +156,14 @@ def CropImage(fPath, patient_num, full_name):
 #             print('lymph save = ', lymph_save)
         os.chdir('E:/HSE/lymphdata/' + full_name + '/RoiVolume_cut/')
         sitk.WriteImage(img_lymph[x_min:x_max, y_min:y_max, z_min:z_max], new_filename)
-        print(new_filename, ' saved')
+        print(f'{new_filename} saved in {os.getcwd()}')
     print('check 4')
 
 
 def CopyLymph(patient_name, only_num):
     # only_num은 환자 번호만
     # patient_name은 _2nd나 날짜도 포함
+    print(f'patient name = {patient_name}, only num = {only_num}')
     roi_cut_fold = 'E:/HSE/lymphdata/'+ patient_name + '/RoiVolume_cut/'
     file_path = 'E:/HSE/LungCancerDetect/data/images/train/'
 
@@ -174,33 +175,39 @@ def CopyLymph(patient_name, only_num):
     roi_list = os.listdir(roi_cut_fold)
     for f in roi_list:
         shutil.copy2(roi_cut_fold + f, file_path + only_num)
-    print('file copied from ', roi_cut_fold, ' to ', file_path + only_num)
+        print(f'Folder exist: {os.path.isdir(file_path + only_num)}')
+        print(f'{f} copied from {roi_cut_fold} to {file_path + only_num}')
 
 # Create RoiVolume_cut Folder to save cropped lymph node data
-# fold_path = glob.glob('E:/HSE/lymphdata/*/')
+# fold_path = glob.glob('E:/HSE/lymphdata/*_*/')
 # count = 0
-#
 # for i in fold_path:
 #     os.makedirs(i + 'RoiVolume_cut/', exist_ok=True)
+#     print(f'New folder created in {os.getcwd()}')
 
 
 # _2nd 이거나 환자이름_날짜 형식으로 되어 이전에 처리 안 된 데이터들만 모으기
-roiPath = glob.glob('E:/HSE/lymphdata/*_*/RoiVolume/')
+roiPath = glob.glob('E:/HSE/lymphdata/*_2nd/RoiVolume/')
 additional_list = []
 fold_list = []
+count = 0
+
 if __name__ == '__main__':
     for i in roiPath:
         patient_name = i.split(os.sep)[-3]
         additional_list.append(patient_name)
         only_num = patient_name.split('_')[0]
         fold_name = 'F:/03. DataSet/Lung Cancer (PET-CT)/SNUH_lung/' + only_num + '/'
+
         # CropImage(fold_name, only_num, patient_name)
         CopyLymph(patient_name, only_num)
 
-        # fold_list.append(fold_name)
+        fold_list.append(fold_name)
+        print(f'only_num = {only_num}')
+        count += 1
         # break
-        # print(f'only_num = {only_num}')
 
+print(f'total processed file number = {count}')
 print(f'Additional list = {additional_list}')
 print(f'Fold list = {fold_list}')
 print(f'len(additional) = {len(additional_list)}')
