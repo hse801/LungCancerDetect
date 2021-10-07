@@ -206,6 +206,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                 if tb_writer:
                     tb_writer.add_histogram('classes', c, 0)
 
+
             # Anchors
             if not opt.noautoanchor:
                 check_anchors(dataset, model=model, thr=hyp['anchor_t'], imgsz=imgsz)

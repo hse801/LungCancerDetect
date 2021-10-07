@@ -20,6 +20,7 @@ class TransformerLayer(nn.Module):
         self.q = nn.Linear(c, c, bias=False) # Query
         self.k = nn.Linear(c, c, bias=False) # Key
         self.v = nn.Linear(c, c, bias=False) # Value
+        # print(f'q = {type(self.q)}, k = {type(self.k)}, v = {type(self.v)}')
         self.ma = nn.MultiheadAttention(embed_dim=c, num_heads=num_heads)
         self.fc1 = nn.Linear(c, c, bias=False)
         self.fc2 = nn.Linear(c, c, bias=False)
@@ -34,6 +35,8 @@ class TransformerBlock(nn.Module):
     # Vision Transformer https://arxiv.org/abs/2010.11929
     def __init__(self, c1, c2, num_heads, num_layers):
         super().__init__()
+        # c1 = 512, c2 = 512, num_heads = 4, num_layers = 4
+        # print(f'c1 = {c1}, c2 = {c2}, num_heads = {num_heads}, num_layers = {num_layers}')
         self.conv = None
         if c1 != c2:
             self.conv = Conv(c1, c2)
@@ -45,17 +48,41 @@ class TransformerBlock(nn.Module):
         if self.conv is not None:
             x = self.conv(x)
         b, _, w, h = x.shape
-        p = x.flatten(2)
-        p = p.unsqueeze(0)
-        p = p.transpose(0, 3)
-        p = p.squeeze(3)
-        e = self.linear(p)
-        x = p + e
+        # b = 1, w = 8, h = 8
+        # 1p = torch.Size([1, 512, 64])
+        # 2p = torch.Size([1, 1, 512, 64])
+        # 3p = torch.Size([64, 1, 512, 1])
+        # 4p = torch.Size([64, 1, 512])
+        # e = torch.Size([64, 1, 512])
+        # b = 1, w = 1, h = 1
+        # 1p = torch.Size([1, 512, 1])
+        # 2p = torch.Size([1, 1, 512, 1])
+        # 3p = torch.Size([1, 1, 512, 1])
+        # 4p = torch.Size([1, 1, 512])
+        # e = torch.Size([1, 1, 512])
 
+        # print(f'b = {b}, w = {w}, h = {h}')
+        # print(f'x = {x.size()}')
+        p = x.flatten(2)
+        # print(f'1p = {p.size()}')
+        p = p.unsqueeze(0)
+        # print(f'2p = {p.size()}')
+        p = p.transpose(0, 3)
+        # print(f'3p = {p.size()}')
+        p = p.squeeze(3)
+        # print(f'4p = {p.size()}')
+        e = self.linear(p)
+        # print(f'e = {e.size()}')
+        x = p + e
+        # print(f'1x = {x.size()}')
         x = self.tr(x)
+        # print(f'2x = {x.size()}')
         x = x.unsqueeze(3)
+        # print(f'3x = {x.size()}')
         x = x.transpose(0, 3)
+        # print(f'4x = {x.size()}')
         x = x.reshape(b, self.c2, w, h)
+        # print(f'5x = {x.size()}')
         return x
 
 
@@ -78,7 +105,11 @@ class C3TR(C3):
     # C3 module with TransformerBlock()
     def __init__(self, c1, c2, n=1, shortcut=True, g=1, e=0.5):
         super().__init__(c1, c2, n, shortcut, g, e)
+        # c1 = 1024, c2 = 1024
+        # c_type = <class 'int'>, c_ = 512
+        # print(f'c1 = {c1}, c2 = {c2}')
         c_ = int(c2 * e)
+        # print(f'c_ type = {type(c_)}, c_ = {c_}')
         self.m = TransformerBlock(c_, c_, 4, n)
 
 

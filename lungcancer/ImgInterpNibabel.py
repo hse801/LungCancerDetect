@@ -1,4 +1,5 @@
 import nibabel
+import SimpleITK as sitk
 from typing import List
 from pathlib import Path
 import tqdm
@@ -76,6 +77,62 @@ def interp_img(src_file: str, dst_file: str, ref_file: str):
 
     nibabel.save(nibabel.Nifti1Pair(src_resize_data, ref_img.affine), dst_file)
 
+
+def CropImage(fPath):
+    ctList = glob.glob(fPath + 'CT*/2*.nii.gz')
+    petList = glob.glob(fPath + 'WT*/*.nii.gz')
+
+    roiList = glob.glob(fPath + 'C1_nestle.nii.gz')
+
+    if (len(roiList) != 1):
+        return
+
+    if (len(ctList) != 1 or len(petList) != 1):
+        return
+
+    img_ct = sitk.ReadImage(ctList[0])
+    # print(img_ct)
+    img_ct_data = sitk.GetArrayFromImage(img_ct)
+    print(img_ct_data)
+    img_pet = sitk.ReadImage(petList[0])
+    img_pet_data = sitk.GetArrayFromImage(img_pet)
+    img_roi = sitk.ReadImage(roiList[0])
+
+    x_ct = np.arange(-img_ct.GetOrigin()[0],
+                     -img_ct.GetOrigin()[0] + (-img_ct.GetSpacing()[0]) * img_ct_data.shape[1],
+                     step=-img_ct.GetSpacing()[0])
+    x_ct = x_ct[::-1]
+    y_ct = np.arange(-img_ct.GetOrigin()[1],
+                     -img_ct.GetOrigin()[1] + img_ct.GetSpacing()[1] * img_ct_data.shape[2],
+                     step=img_ct.GetSpacing()[1])
+    z_ct = np.arange(img_ct.GetOrigin()[2],
+                     img_ct.GetOrigin()[2] + img_ct.GetSpacing()[2] * img_ct_data.shape[0],
+                     step=img_ct.GetSpacing()[2])
+
+    x_pet = np.arange(-img_pet.GetOrigin()[0],
+                      -img_pet.GetOrigin()[0] + (-img_pet.GetSpacing()[0]) * img_pet_data.shape[1],
+                      step=-img_pet.GetSpacing()[0])
+    x_pet = x_pet[::-1]
+    y_pet = np.arange(-img_pet.GetOrigin()[1],
+                      -img_pet.GetOrigin()[1] + img_pet.GetSpacing()[1] * img_pet_data.shape[2],
+                      step=img_pet.GetSpacing()[1])
+    z_pet = np.arange(img_pet.GetOrigin()[2],
+                      img_pet.GetOrigin()[2] + img_pet.GetSpacing()[2] * img_pet_data.shape[0],
+                      step=img_pet.GetSpacing()[2])
+    mesh_pet = np.array(np.meshgrid(z_pet, y_pet, x_pet))
+
+    mesh_points = np.rollaxis(mesh_pet, 0, 4)
+    mesh_points = np.rollaxis(mesh_points, 0, 2)
+    interp = interpn((z_ct, y_ct, x_ct), img_ct_data[:, :, ::-1],
+                     mesh_points, bounds_error=False, fill_value=-1024)
+
+    ct_crop_img = sitk.GetImageFromArray(interp[80:170, :, ::-1])
+    ct_crop_img.CopyInformation(img_pet[:, :, 80:170])
+
+    os.chdir(fPath)
+    sitk.WriteImage(ct_crop_img, "CT_crop_h.nii.gz")
+    sitk.WriteImage(img_pet[:, :, 80:170], "PET_crop_h.nii.gz")
+    sitk.WriteImage(img_roi[::-1, :, 80:170], "ROI_crop_h.nii.gz")
 
 def save_img():
     fold_list = glob.glob('E:/HSE/tempdata/*/')
