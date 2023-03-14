@@ -1,4 +1,8 @@
-## Lung Cancer and Lymph Node Metastasis Detection on FDG PET/CT Images using YOLO Algorithm
+# Lung Cancer and Lymph Node Metastasis Detection on FDG PET/CT Images using YOLO Algorithm
+
+**Objective**
+• To reduce time and effort for the detection of lung cancer
+• Detecting primary tumors and lymph node metastases using a deep neural network
 
 ![image](https://user-images.githubusercontent.com/61612117/224949047-68f44e2f-d51d-4c55-be19-f5b5908b9141.png)
 ![image](https://user-images.githubusercontent.com/61612117/224949205-33e2c962-5d29-49b7-aed7-e57a13efc919.png)
